@@ -1747,15 +1747,21 @@ function addShop() {
   DB.shopping.push({ id: uid(), text: v, cat, done: false, note: '', buyTime: '', amount: '' });
   save(); document.getElementById('shop-input').value = ''; renderShop(); updateBadges();
 }
-function renderShop() {
-  const list = document.getElementById('shop-list');
+function updateShopStats() {
   const total = DB.shopping.length;
   const done = DB.shopping.filter(s => s.done).length;
   const spent = DB.shopping.filter(s => !s.done).reduce((sum, s) => sum + num(s.amount), 0);
-  document.getElementById('shop-progress-bar').style.width = total ? (done / total * 100) + '%' : '0';
+  const bar = document.getElementById('shop-progress-bar');
+  if (!bar) return;
+  bar.style.width = total ? (done / total * 100) + '%' : '0';
   document.getElementById('shop-progress-txt').textContent = total ? `${done}/${total} 已购` : '';
   document.getElementById('shop-total').textContent = spent.toFixed(2);
   document.getElementById('shop-bought').textContent = done;
+}
+function renderShop() {
+  const list = document.getElementById('shop-list');
+  const total = DB.shopping.length;
+  updateShopStats();
   if (!total) { list.innerHTML = '<div class="empty">清单是空的，添加要买的东西吧</div>'; return; }
   list.innerHTML = DB.shopping.map(s => `
     <div class="shop-item-wrap ${s.done ? 'done' : ''}">
@@ -1777,7 +1783,7 @@ function renderShop() {
   list.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => editShop(b.dataset.edit)));
   list.querySelectorAll('[data-note]').forEach(n => n.addEventListener('input', () => { DB.shopping.find(x => x.id === n.dataset.note).note = n.value; save(); }));
   list.querySelectorAll('[data-buytime]').forEach(n => n.addEventListener('input', () => { DB.shopping.find(x => x.id === n.dataset.buytime).buyTime = n.value; save(); }));
-  list.querySelectorAll('[data-amt]').forEach(n => n.addEventListener('input', () => { DB.shopping.find(x => x.id === n.dataset.amt).amount = n.value; save(); renderShop(); updateBadges(); }));
+  list.querySelectorAll('[data-amt]').forEach(n => n.addEventListener('input', () => { DB.shopping.find(x => x.id === n.dataset.amt).amount = n.value; save(); updateShopStats(); updateBadges(); }));
   list.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { DB.shopping = DB.shopping.filter(x => x.id !== b.dataset.del); save(); renderShop(); updateBadges(); }));
 }
 
