@@ -564,6 +564,16 @@
     <section class="section" id="sec-diet">
       <div class="sec-head"><h1><span class="sec-icon" data-sec-icon="diet"></span>减肥打卡</h1><p>断食窗口 · 三餐热量（食物+克数自动估算）· 每日运动</p></div>
 
+      <div class="date-nav diet-nav" style="margin:2px 0 14px">
+        <button id="meal-date-prev" title="前一天">‹</button>
+        <button id="meal-date-next" title="后一天">›</button>
+        <div class="dn-center">
+          <input type="date" id="meal-view-date">
+          <span class="dn-label" id="meal-date-label">今天</span>
+          <button class="btn-ghost btn-sm dn-today" id="meal-date-today">回到今天</button>
+        </div>
+      </div>
+
       <div class="card">
         <h2>⏱️ 断食记录 <span class="tag">按开始 / 结束，时间可改</span></h2>
         <div style="text-align:center;padding:6px 0">
@@ -581,10 +591,6 @@
           <div class="field"><label>结束时间（可调整）</label><input type="datetime-local" id="fast-end"></div>
         </div>
 
-        <h2 style="margin-top:18px">🍽️ 16:8 今日打卡</h2>
-        <div class="progress"><i id="fast-168-bar"></i></div>
-        <div id="fast-168-status" style="margin:6px 0 10px;font-weight:600;font-size:14px"></div>
-        <div class="hint">目标：今日断食累计 ≥ 16 小时，还差多久达成都会显示在这里。</div>
         <div class="list" id="fast-log" style="margin-top:10px"></div>
       </div>
 
@@ -611,15 +617,6 @@
 
       <div class="card">
         <h2>🍽️ 三餐记录 <span class="tag">（食物 + 克数 → 自动算热量，可改）</span></h2>
-        <div class="date-nav">
-          <button id="meal-date-prev" title="前一天">‹</button>
-          <button id="meal-date-next" title="后一天">›</button>
-          <div class="dn-center">
-            <input type="date" id="meal-view-date">
-            <span class="dn-label" id="meal-date-label">今天</span>
-            <button class="btn-ghost btn-sm dn-today" id="meal-date-today">回到今天</button>
-          </div>
-        </div>
         <div class="tabs" id="meal-tabs">
           <div class="tab active" data-meal="breakfast">早餐</div>
           <div class="tab" data-meal="lunch">午餐</div>
@@ -1026,11 +1023,11 @@ function switchSec(sec) {
   document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === 'sec-' + sec));
   if (window.innerWidth <= 720) window.scrollTo(0, 0);
   if (sec === 'home') refreshQuote();
-  if (sec === 'diet') { renderWeight(); renderFasts(); }
+  if (sec === 'diet') { renderDietAll(); }
 }
 document.querySelectorAll('[data-sec]').forEach(el => el.addEventListener('click', () => switchSec(el.dataset.sec)));
 
-/* ============ 减肥：断食记录（开始/结束 + 可调整时间 + 16:8）============ */
+/* ============ 减肥：断食记录（开始/结束 + 可调整时间）============ */
 function fmtDur(ms) {
   const s = Math.floor(ms / 1000);
   const hh = String(Math.floor(s / 3600)).padStart(2, '0');
@@ -1073,12 +1070,7 @@ function fastTick() {
     const st = new Date(DB.fastStart);
     if (!isNaN(st.getTime())) { el.textContent = fmtHm((Date.now() - st.getTime()) / 60000); return; }
   }
-  if (!DB.fastActive) {
-    const t = todayStr();
-    const todayFasts = DB.fasts.filter(f => fastDateOf(f.start) === t);
-    const last = todayFasts[todayFasts.length - 1];
-    el.textContent = last ? fmtHm(num(last.mins)) : '0 时 00 分';
-  }
+  el.textContent = '0 时 00 分';
 }
 function renderFasts() {
   const tg = document.getElementById('fast-toggle');
@@ -1094,17 +1086,8 @@ function renderFasts() {
     tg.textContent = '开始禁食';
     sub.textContent = '点「开始禁食」记录起始时刻（时间可改）';
   }
-  const t = todayStr();
+  const t = dietViewDate;
   const todayFasts = DB.fasts.filter(f => fastDateOf(f.start) === t);
-  const fastMins = todayFasts.reduce((a, b) => a + (num(b.mins) || 0), 0);
-  const GOAL = 16 * 60;
-  const bar = document.getElementById('fast-168-bar');
-  if (bar) bar.style.width = Math.min(100, fastMins / GOAL * 100) + '%';
-  const stEl = document.getElementById('fast-168-status');
-  if (stEl) {
-    if (fastMins >= GOAL) { stEl.innerHTML = '✅ 今日已达成 16:8'; stEl.style.color = 'var(--green, #2e9e5b)'; }
-    else { stEl.innerHTML = '⏳ 还差 ' + fmtHm(GOAL - fastMins) + ' 达成 16:8'; stEl.style.color = 'var(--amber, #d98a00)'; }
-  }
   fastTick();
   const log = document.getElementById('fast-log');
   if (!log) return;
@@ -1130,18 +1113,21 @@ setInterval(fastTick, 1000);
 /* ============ 减肥：体重（滑块 + 折线图）============ */
 function renderWeight() {
   const w = DB.weight;
-  const recs = w.records.slice().sort((a, b) => a.date.localeCompare(b.date));
-  const cur = recs.length ? num(recs[recs.length - 1].value) : num(w.initial);
+  const view = dietViewDate;
+  const rec = w.records.find(r => r.date === view);
+  const cur = rec ? num(rec.value) : num(w.initial);
   const init = num(w.initial);
-  const curEl = document.getElementById('w-cur'); if (curEl) curEl.textContent = cur.toFixed(1);
-  const subEl = document.getElementById('w-sub'); if (subEl) subEl.textContent = `初始 ${init.toFixed(1)} kg　|　较初始 ${(cur - init).toFixed(1)} kg`;
+  const curEl = document.getElementById('w-cur'); if (curEl) curEl.textContent = rec ? cur.toFixed(1) : '—';
+  const subEl = document.getElementById('w-sub');
+  if (subEl) subEl.textContent = rec ? (`${view} ${cur.toFixed(1)} kg　|　较初始 ${(cur - init).toFixed(1)} kg`) : (`${view} 暂无记录　|　初始 ${init.toFixed(1)} kg`);
   const slider = document.getElementById('w-slider'); if (slider) slider.value = cur;
   const slval = document.getElementById('w-slval'); if (slval) slval.textContent = cur.toFixed(1);
+  const btn = document.getElementById('w-record'); if (btn) btn.textContent = (view === todayStr()) ? '记录今日体重' : '记录该日体重';
   const list = document.getElementById('w-list');
   if (!list) return;
-  if (!recs.length) { list.innerHTML = '<div class="empty">还没有体重记录，拖动滑块后点「记录今日体重」</div>'; }
+  if (!w.records.length) { list.innerHTML = '<div class="empty">还没有体重记录，拖动滑块后点「记录体重」</div>'; }
   else {
-    list.innerHTML = recs.slice().reverse().map(r => `<div class="item"><div class="info"><div class="title">⚖️ ${num(r.value).toFixed(1)} kg</div><div class="meta">${r.date}</div></div><div class="acts"><button class="btn-ghost btn-sm" data-wedit="${r.date}">修改</button><button class="btn-danger btn-sm" data-wdel="${r.date}">✕</button></div></div>`).join('');
+    list.innerHTML = w.records.slice().sort((a, b) => b.date.localeCompare(a.date)).map(r => `<div class="item"><div class="info"><div class="title">⚖️ ${num(r.value).toFixed(1)} kg</div><div class="meta">${r.date}</div></div><div class="acts"><button class="btn-ghost btn-sm" data-wedit="${r.date}">修改</button><button class="btn-danger btn-sm" data-wdel="${r.date}">✕</button></div></div>`).join('');
     list.querySelectorAll('[data-wedit]').forEach(b => b.addEventListener('click', () => { const r = DB.weight.records.find(x => x.date === b.dataset.wedit); if (r) { const sl = document.getElementById('w-slider'); if (sl) sl.value = r.value; const sv = document.getElementById('w-slval'); if (sv) sv.textContent = num(r.value).toFixed(1); } }));
     list.querySelectorAll('[data-wdel]').forEach(b => b.addEventListener('click', () => { DB.weight.records = DB.weight.records.filter(x => x.date !== b.dataset.wdel); save(); renderWeight(); }));
   }
@@ -1151,11 +1137,11 @@ document.getElementById('w-slider').addEventListener('input', () => { const v = 
 document.getElementById('w-record').addEventListener('click', () => {
   const v = num(document.getElementById('w-slider').value);
   if (!v) { alert('请先拖动滑块选择体重'); return; }
-  const today = todayStr();
-  const ex = DB.weight.records.find(r => r.date === today);
-  if (ex) ex.value = v; else DB.weight.records.push({ date: today, value: v });
+  const day = dietViewDate;
+  const ex = DB.weight.records.find(r => r.date === day);
+  if (ex) ex.value = v; else DB.weight.records.push({ date: day, value: v });
   save(); renderWeight();
-  const btn = document.getElementById('w-record'); btn.textContent = '已记录 ✓'; setTimeout(() => btn.textContent = '记录今日体重', 1200);
+  const btn = document.getElementById('w-record'); btn.textContent = '已记录 ✓'; setTimeout(() => { if (btn) btn.textContent = (day === todayStr()) ? '记录今日体重' : '记录该日体重'; }, 1200);
 });
 document.getElementById('w-chart').addEventListener('click', () => {
   const box = document.getElementById('w-chart-box');
@@ -1228,16 +1214,19 @@ function syncDateNav() {
   const lbl = document.getElementById('meal-date-label');
   if (lbl) lbl.textContent = dateLabel(dietViewDate);
 }
+function renderDietAll() {
+  renderFasts(); renderWeight(); renderMeals(); renderDrinks(); renderExercises();
+}
 function shiftDietDate(delta) {
   const d = new Date(dietViewDate + 'T00:00:00');
   d.setDate(d.getDate() + delta);
   dietViewDate = todayStr(d);
-  syncDateNav(); renderMeals(); renderDrinks();
+  syncDateNav(); renderDietAll();
 }
 document.getElementById('meal-date-prev').addEventListener('click', () => shiftDietDate(-1));
 document.getElementById('meal-date-next').addEventListener('click', () => shiftDietDate(1));
-document.getElementById('meal-date-today').addEventListener('click', () => { dietViewDate = todayStr(); syncDateNav(); renderMeals(); renderDrinks(); });
-document.getElementById('meal-view-date').addEventListener('change', e => { if (e.target.value) { dietViewDate = e.target.value; syncDateNav(); renderMeals(); renderDrinks(); } });
+document.getElementById('meal-date-today').addEventListener('click', () => { dietViewDate = todayStr(); syncDateNav(); renderDietAll(); });
+document.getElementById('meal-view-date').addEventListener('change', e => { if (e.target.value) { dietViewDate = e.target.value; syncDateNav(); renderDietAll(); } });
 
 document.querySelectorAll('#meal-tabs .tab').forEach(t => {
   t.addEventListener('click', () => {
@@ -1281,7 +1270,7 @@ document.getElementById('meal-add').addEventListener('click', () => {
     DB.meals[curMeal].push({ id: mealEditing.id, cat: curMeal, date: mealEditing.date, food, grams, kcal, time });
     save(); cancelMealEdit(); renderMeals(); renderDrinks(); updateBadges(); return;
   }
-  DB.meals[curMeal].push({ id: uid(), cat: curMeal, date: todayStr(), food, grams, kcal, time });
+  DB.meals[curMeal].push({ id: uid(), cat: curMeal, date: dietViewDate, food, grams, kcal, time });
   save();
   document.getElementById('meal-food').value = ''; document.getElementById('meal-grams').value = ''; document.getElementById('meal-kcal').value = ''; document.getElementById('meal-time').value = '';
   renderMeals(); updateBadges();
@@ -1368,7 +1357,7 @@ document.getElementById('drink-add').addEventListener('click', () => {
     DB.drinks = (DB.drinks || []).map(d => d.id === drinkEditing.id ? { ...d, ...data } : d);
     save(); cancelDrinkEdit(); renderDrinks(); renderMeals(); updateBadges(); return;
   }
-  DB.drinks.push({ id: uid(), date: todayStr(), ...data });
+  DB.drinks.push({ id: uid(), date: dietViewDate, ...data });
   save();
   document.getElementById('drink-brand').value = ''; document.getElementById('drink-name').value = '奶茶';
   document.getElementById('drink-time').value = ''; document.getElementById('drink-price').value = ''; document.getElementById('drink-kcal').value = '';
@@ -1443,20 +1432,21 @@ document.getElementById('ex-add').addEventListener('click', () => {
     DB.exercises = DB.exercises.map(e => e.id === exEditing.id ? { ...e, type, min, time: document.getElementById('ex-time').value, kcal } : e);
     save(); cancelExEdit(); renderExercises(); updateBadges(); return;
   }
-  DB.exercises.push({ id: uid(), type, min, time: document.getElementById('ex-time').value, kcal });
+  DB.exercises.push({ id: uid(), type, min, time: document.getElementById('ex-time').value, kcal, date: dietViewDate });
   save();
   document.getElementById('ex-min').value = ''; document.getElementById('ex-time').value = ''; document.getElementById('ex-kcal').value = '';
   renderExercises(); updateBadges();
 });
 function renderExercises() {
   const list = document.getElementById('ex-list');
+  const view = DB.exercises.filter(e => !e.date || e.date === dietViewDate);
   let totalMin = 0, totalKcal = 0;
-  DB.exercises.forEach(e => { totalMin += e.min; totalKcal += e.kcal; });
+  view.forEach(e => { totalMin += e.min; totalKcal += e.kcal; });
   document.getElementById('ex-total-min').textContent = Math.round(totalMin);
   document.getElementById('ex-total-kcal').textContent = Math.round(totalKcal);
-  document.getElementById('ex-count').textContent = DB.exercises.length;
+  document.getElementById('ex-count').textContent = view.length;
   if (!DB.exercises.length) { list.innerHTML = '<div class="empty">还没有运动记录，动起来吧 💪</div>'; return; }
-  list.innerHTML = DB.exercises.map(e => `
+  list.innerHTML = view.map(e => `
     <div class="item">
       <div class="info"><div class="title">${e.type}</div><div class="meta">${e.time ? '🕐 ' + e.time + '　' : ''}时长 ${e.min} 分钟　<span class="kcal">🔥 ${Math.round(e.kcal)} kcal</span></div></div>
       <div class="acts">
