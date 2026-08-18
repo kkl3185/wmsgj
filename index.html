@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="sage">
+<html lang="zh-CN" data-theme="choco">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>针织帽 · 生活工作台</title>
-<meta name="theme-color" content="#7E9B7A">
+<meta name="theme-color" content="#6B4A33">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -14,22 +14,22 @@
 <link rel="apple-touch-icon" href="./icon-192.png">
 <style>
   :root {
-    --bg: #EEF1EA;
-    --sidebar: #F6F8F3;
+    --bg: #F3ECE4;
+    --sidebar: #FBF6F0;
     --card: #FFFFFF;
-    --ink: #3A4036;
-    --muted: #8A9382;
-    --line: #DEE4D8;
-    --brand: #7E9B7A;
-    --brand-2: #A9C4A2;
-    --brand-soft: #E8F0E6;
-    --green: #6FA56B;
-    --pink: #D8A6B0;
-    --amber: #C9A86A;
-    --shadow: 0 8px 24px rgba(90,110,85,.12);
-    --glow: rgba(126,155,122,.30);
-    --tint: #F0F4EC;
-    --radius: 18px;
+    --ink: #4A3F36;
+    --muted: #9C8B7B;
+    --line: #E9DED2;
+    --brand: #B07A4E;
+    --brand-2: #C99A6E;
+    --brand-soft: #F2E7DA;
+    --green: #7E9B6E;
+    --pink: #D6A0A8;
+    --amber: #D9A24E;
+    --shadow: 0 10px 28px rgba(120,90,60,.14);
+    --glow: rgba(176,122,78,.32);
+    --tint: #F8F1E9;
+    --radius: 20px;
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
@@ -214,12 +214,14 @@
       display: flex; position: fixed; bottom: 0; left: 0; right: 0;
       background: rgba(255,253,250,.96); backdrop-filter: blur(10px);
       border-top: 1px solid var(--line); padding: 7px 4px calc(7px + env(safe-area-inset-bottom));
-      justify-content: space-around; z-index: 60; box-shadow: 0 -4px 18px rgba(120,90,60,.10);
+      justify-content: flex-start; gap: 2px; overflow-x: auto; z-index: 60; box-shadow: 0 -4px 18px rgba(120,90,60,.10);
+      scrollbar-width: none;
     }
+    .bottom-nav::-webkit-scrollbar { display: none; }
     .bottom-nav button {
       display: flex; flex-direction: column; align-items: center; gap: 2px;
       background: none; border: none; font-size: 10px; color: var(--muted);
-      cursor: pointer; padding: 4px 2px; flex: 1; font-weight: 600; font-family: inherit;
+      cursor: pointer; padding: 4px 2px; flex: 0 0 auto; min-width: 58px; font-weight: 600; font-family: inherit;
     }
     .bottom-nav button span { font-size: 21px; }
     .bottom-nav button.active { color: var(--brand); }
@@ -227,13 +229,6 @@
   }
 
   /* ===== 首页导航 ===== */
-  .home-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 6px; }
-  .home-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 8px; text-align: center; cursor: pointer; transition: .15s; box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center; gap: 4px; }
-  .home-card:active { transform: scale(.97); }
-  .home-card .em { font-size: 26px; }
-  .home-card .tt { font-weight: 700; font-size: 13px; }
-  .home-card .ds { font-size: 10.5px; color: var(--muted); line-height: 1.3; }
-  .home-card .bb { margin-top: 1px; font-size: 11px; color: var(--brand); min-height: 14px; }
 
   /* ===== 断食计时器 ===== */
   .timer-phase { display: inline-block; font-weight: 700; padding: 4px 12px; border-radius: 99px; background: var(--brand-soft); color: var(--brand); font-size: 14px; }
@@ -277,7 +272,6 @@
 
   /* ===== 导航小狗图标 ===== */
   .emoji svg, .bottom-nav button > span svg { width: 22px; height: 22px; display: block; }
-  .home-card .em svg { width: 30px; height: 30px; display: block; margin: 0 auto 3px; }
   .logo svg, .home-avatar svg { width: 100%; height: 100%; display: block; }
   .sec-icon svg { width: 30px; height: 30px; vertical-align: middle; margin-right: 8px; display: inline-block; }
 
@@ -455,7 +449,6 @@
   .im-tip { font-size: 11.5px; color: var(--muted); line-height: 1.6; border-top: 1px solid var(--line); padding-top: 12px; }
   /* 自定义上传图标：固定尺寸，防止大图撑大布局 */
   .nav-item .emoji img, .bottom-nav button span img { width: 22px; height: 22px; object-fit: cover; border-radius: 6px; display: block; }
-  .home-card .em img { width: 30px; height: 30px; object-fit: cover; border-radius: 8px; display: block; margin: 0 auto 3px; }
   .sec-icon img { width: 30px; height: 30px; object-fit: cover; border-radius: 8px; vertical-align: middle; margin-right: 8px; display: inline-block; }
   .brand .logo img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; display: block; }
   .tab-x { margin-left: 6px; font-size: 11px; color: var(--muted); cursor: pointer; padding: 0 4px; border-radius: 6px; }
@@ -466,9 +459,110 @@
   .weight-slval { font-size: 16px; font-weight: 700; min-width: 48px; text-align: right; }
   #w-slider { accent-color: var(--brand); }
   .weight-chart { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line); }
+
+  /* ===== 进入页（头像 + 进入按钮）===== */
+  .landing { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(140% 120% at 50% 0%, #CDEEDB 0%, #ABDEC9 58%, #8FCFB4 100%);
+    transition: opacity .45s ease; -webkit-font-smoothing: antialiased; overflow: hidden; }
+  .landing-dots { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  .landing.hide { opacity: 0; pointer-events: none; }
+  .landing-card { position: relative; z-index: 1; text-align: center; color: #5B4A38; padding: 30px; animation: landIn .55s cubic-bezier(.2,.7,.3,1); }
+  @keyframes landIn { from { opacity: 0; transform: translateY(16px) scale(.97); } to { opacity: 1; transform: none; } }
+  .landing-avatar { width: 94px; height: 94px; border-radius: 30px; margin: 0 auto 18px; background: rgba(255,255,255,.72);
+    display: grid; place-items: center; font-size: 50px; box-shadow: 0 14px 32px rgba(90,65,40,.22); overflow: hidden; }
+  .landing-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 30px; }
+  .landing-title { font-size: 30px; font-weight: 900; letter-spacing: 4px; color: #5B4A38; }
+  .landing-sub { font-size: 14px; opacity: .85; margin: 8px 0 30px; letter-spacing: 1px; color: #6E5A47; }
+  .landing-enter { background: #7C5A3C; color: #fff; font-size: 16px; font-weight: 800; padding: 14px 40px; border-radius: 16px;
+    box-shadow: 0 10px 26px rgba(80,50,30,.28); border: none; cursor: pointer; font-family: inherit; }
+  .landing-enter:active { transform: scale(.96); }
+
+  /* ===== 事情表 / 纪念日 通用 ===== */
+  .card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+  .card-top h2 { margin-bottom: 0; }
+  .icon-modal-box h3 { margin: 0 0 16px; font-size: 18px; font-weight: 800; }
+  .icon-modal-box .field { margin-bottom: 14px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+  .home-date-link { cursor: pointer; }
+  .home-date-link:active { opacity: .6; }
+  .cd-pill { font-size: 12px; font-weight: 800; padding: 3px 11px; border-radius: 20px; white-space: nowrap; }
+  .cd-pill.future { background: var(--brand-soft); color: var(--brand); }
+  .cd-pill.past { background: #FBEEE5; color: var(--amber); }
+  .cd-pill.today { background: var(--green); color: #fff; }
+  .show-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); cursor: pointer; user-select: none; }
+  .show-toggle input { width: auto; accent-color: var(--brand); }
+  .cal-head { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .cal-head .cal-title { margin-right: auto; }
+  .cal-legend .lg-mark { background: var(--brand); }
+  .cal-cell.mark { background: var(--brand); color: #fff; font-weight: 700; }
+  .cal-cell.mark.today { box-shadow: 0 0 0 2px var(--brand) inset, 0 0 0 4px #fff inset; }
+  .home-block { margin-top: 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
+  .home-block-head { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; margin-bottom: 10px; }
+  .home-block-head .btn-sm { margin-left: auto; }
+  .home-anni { margin-top: 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
+  .home-anni-head { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; margin-bottom: 12px; cursor: pointer; }
+  .home-anni-head .more { margin-left: auto; font-size: 13px; color: var(--muted); font-weight: 600; }
+  .home-anni-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .anni-card { position: relative; border-radius: 14px; overflow: hidden; background: var(--tint); border: 1px solid var(--line); min-height: 148px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .anni-card .anni-photo { position: absolute; inset: 0; background-size: cover; background-position: center; }
+  .anni-card .anni-bg { position: absolute; inset: 0; background: linear-gradient(135deg, var(--brand-soft), var(--brand-2)); opacity: .92; }
+  .anni-card .anni-overlay { position: relative; padding: 10px 12px; background: linear-gradient(transparent, rgba(0,0,0,.5)); color: #fff; }
+  .anni-card .anni-name { font-weight: 800; font-size: 15px; }
+  .anni-card .anni-date { font-size: 11.5px; opacity: .92; }
+  .anni-card .anni-cd { margin-top: 4px; font-size: 13px; font-weight: 700; background: rgba(255,255,255,.24); display: inline-block; padding: 2px 9px; border-radius: 20px; }
+  .anni-card .anni-cd.today { background: #fff; color: var(--brand); }
+  .home-anni-empty { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .anni-thumb { width: 42px; height: 42px; border-radius: 10px; background-size: cover; background-position: center; flex-shrink: 0; }
+  .anni-thumb-empty { display: grid; place-items: center; background: var(--tint); font-size: 18px; }
+  .ck { display: inline-flex; align-items: center; cursor: pointer; flex-shrink: 0; }
+  .ck input { width: auto; accent-color: var(--brand); }
+  .item.done .title { text-decoration: line-through; opacity: .5; }
+  .item .title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cal-dot { position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 5px; height: 5px; border-radius: 50%; background: #fff; display: block; }
 </style>
 </head>
 <body>
+<div class="landing" id="landing">
+  <svg class="landing-dots" viewBox="0 0 414 896" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="#9A7556">
+      <circle cx="40" cy="70" r="6" opacity="0.45"/>
+      <circle cx="96" cy="150" r="9" opacity="0.35"/>
+      <circle cx="330" cy="90" r="5" opacity="0.5"/>
+      <circle cx="200" cy="50" r="4" opacity="0.4"/>
+      <circle cx="372" cy="180" r="8" opacity="0.3"/>
+      <circle cx="58" cy="250" r="7" opacity="0.42"/>
+      <circle cx="300" cy="300" r="5" opacity="0.5"/>
+      <circle cx="160" cy="360" r="11" opacity="0.28"/>
+      <circle cx="34" cy="440" r="6" opacity="0.45"/>
+      <circle cx="250" cy="470" r="4" opacity="0.4"/>
+      <circle cx="372" cy="520" r="9" opacity="0.32"/>
+      <circle cx="120" cy="560" r="6" opacity="0.45"/>
+      <circle cx="300" cy="360" r="3" opacity="0.5"/>
+      <circle cx="340" cy="640" r="5" opacity="0.5"/>
+      <circle cx="64" cy="700" r="10" opacity="0.3"/>
+      <circle cx="220" cy="740" r="4" opacity="0.42"/>
+      <circle cx="382" cy="800" r="7" opacity="0.38"/>
+      <circle cx="160" cy="850" r="6" opacity="0.45"/>
+      <circle cx="90" cy="500" r="5" opacity="0.5"/>
+      <circle cx="290" cy="680" r="6" opacity="0.42"/>
+      <circle cx="200" cy="200" r="4" opacity="0.4"/>
+      <circle cx="344" cy="420" r="5" opacity="0.5"/>
+      <circle cx="44" cy="360" r="7" opacity="0.4"/>
+      <circle cx="260" cy="620" r="5" opacity="0.5"/>
+      <circle cx="130" cy="110" r="4" opacity="0.45"/>
+      <circle cx="360" cy="260" r="6" opacity="0.4"/>
+      <circle cx="24" cy="560" r="5" opacity="0.5"/>
+      <circle cx="300" cy="820" r="4" opacity="0.45"/>
+      <circle cx="120" cy="800" r="3" opacity="0.5"/>
+    </g>
+  </svg>
+  <div class="landing-card">
+    <div class="landing-avatar" id="landing-avatar">🧶</div>
+    <div class="landing-title">针织帽</div>
+    <div class="landing-sub">你的生活小角落</div>
+    <button class="landing-enter" id="landing-enter">进入工作台 →</button>
+  </div>
+</div>
 <div class="app">
   <aside class="sidebar">
     <div class="brand">
@@ -502,6 +596,8 @@
     <div class="nav-item" data-sec="money"><span class="emoji">💰</span><span class="txt">存钱</span><span class="badge" id="badge-money"></span></div>
     <div class="nav-item" data-sec="hobby"><span class="emoji">🎨</span><span class="txt">兴趣爱好</span><span class="badge" id="badge-hobby"></span></div>
     <div class="nav-item" data-sec="fortune"><span class="emoji">🔮</span><span class="txt">运势日历</span><span class="badge" id="badge-fortune"></span></div>
+    <div class="nav-item" data-sec="agenda"><span class="emoji">📝</span><span class="txt">事情表</span><span class="badge" id="badge-agenda"></span></div>
+    <div class="nav-item" data-sec="calendar"><span class="emoji">📅</span><span class="txt">纪念日</span></div>
     <div class="foot">数据保存在本机浏览器<br>🧶 针织帽 · 你的生活小角落</div>
   </aside>
 
@@ -515,6 +611,8 @@
     <button data-sec="money"><span>💰</span>存钱</button>
     <button data-sec="hobby"><span>🎨</span>爱好</button>
     <button data-sec="fortune"><span>🔮</span>运势</button>
+    <button data-sec="agenda"><span>📝</span>事情表</button>
+    <button data-sec="calendar"><span>📅</span>纪念日</button>
   </nav>
 
   <main class="main">
@@ -526,8 +624,8 @@
           <div class="home-avatar" id="home-logo">🧶</div>
           <div class="home-greet">
             <div class="greet" id="home-greet">你好呀</div>
-            <div class="date-big" id="home-date">—</div>
-            <div class="date-sub" id="home-weekday">—</div>
+            <div class="date-big home-date-link" id="home-date">—</div>
+            <div class="date-sub home-date-link" id="home-weekday">—</div>
           </div>
           <div class="home-clock">
             <div class="clock-time" id="home-clock-time">--:--:--</div>
@@ -557,7 +655,11 @@
           <div class="ts-chips" id="theme-chips"></div>
         </div>
       </div>
-      <div class="home-grid" id="home-grid"></div>
+      <div class="home-block">
+        <div class="home-block-head"><span>📝 事情表</span><button class="btn-primary btn-sm" id="home-agenda-add">＋ 添加</button></div>
+        <div class="list" id="home-agenda-list"></div>
+      </div>
+      <div class="home-anni" id="home-anni"></div>
     </section>
 
     <!-- ===== 减肥 ===== -->
@@ -923,11 +1025,6 @@
         </div>
         <div class="zodiac-bar" id="f-zodiac"></div>
 
-        <div class="row" style="align-items:flex-end;margin-top:10px">
-          <div class="field" style="max-width:220px"><label>你的 MBTI</label><select id="mbti-sel"></select></div>
-          <div class="field field-btn"><label>&nbsp;</label><span class="tag" id="mbti-trait"></span></div>
-        </div>
-
         <div class="fortune-overall">
           <span class="stars" id="f-overall-stars">★★★★★</span>
           <span class="txt" id="f-overall-txt">—</span>
@@ -950,7 +1047,67 @@
       </div>
     </section>
 
+    <!-- ===== 事情表 ===== -->
+    <section class="section" id="sec-agenda">
+      <div class="sec-head"><h1>📝 事情表</h1><p>记下某天要做的某件事；点「＋ 添加」弹出填写，确定即加入列表</p></div>
+      <div class="card">
+        <div class="card-top">
+          <h2>📋 待办事情</h2>
+          <button class="btn-primary btn-sm" id="agenda-add">＋ 添加</button>
+        </div>
+        <div class="list" id="agenda-list"></div>
+      </div>
+    </section>
+
+    <!-- ===== 纪念日日历 ===== -->
+    <section class="section" id="sec-calendar">
+      <div class="sec-head"><h1>📅 纪念日日历</h1><p>首页日期点进来就是这里；添加纪念日，看还有几天 / 已过几天，可勾选放首页</p></div>
+      <div class="card">
+        <h2>🗓️ 月历</h2>
+        <div class="cal-head">
+          <button class="cal-arrow" id="anni-prev">‹</button>
+          <div class="cal-title" id="anni-title">—</div>
+          <button class="cal-arrow" id="anni-next">›</button>
+          <button class="btn-primary btn-sm" id="anni-add">＋ 加纪念日</button>
+        </div>
+        <div class="cal-weekdays"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+        <div class="cal-grid" id="anni-grid"></div>
+        <div class="cal-legend"><span><i class="lg lg-active"></i>今天</span><span><i class="lg lg-mark"></i>有纪念日</span></div>
+      </div>
+      <div class="card">
+        <div class="card-top"><h2>🎉 我的纪念日</h2></div>
+        <div class="list" id="anni-list"></div>
+      </div>
+    </section>
+
   </main>
+
+  <!-- ===== 弹窗：添加事情 ===== -->
+  <div class="icon-modal" id="agenda-modal">
+    <div class="icon-modal-box">
+      <h3>添加事情</h3>
+      <div class="field"><label>日期</label><input type="date" id="agenda-date"></div>
+      <div class="field"><label>要做的事</label><input type="text" id="agenda-text" placeholder="例如：交水电费 / 去体检"></div>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="agenda-cancel">取消</button>
+        <button class="btn-primary" id="agenda-ok">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 弹窗：添加纪念日 ===== -->
+  <div class="icon-modal" id="anni-modal">
+    <div class="icon-modal-box">
+      <h3>添加纪念日</h3>
+      <div class="field"><label>名称</label><input type="text" id="anni-name" placeholder="例如：妈妈生日 / 恋爱纪念日"></div>
+      <div class="field"><label>日期（每年这天）</label><input type="date" id="anni-date"></div>
+      <div class="field"><label>照片（可选）</label><input type="file" id="anni-photo" accept="image/*"></div>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="anni-cancel">取消</button>
+        <button class="btn-primary" id="anni-ok">确定</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -977,10 +1134,11 @@ function load() {
     timers: [],
     shopCats: ['日用品', '食物', '其他'],
     weight: { initial: 50, records: [] },
-    fortuneMbti: 'INFP',
+    agenda: [],
+    anniversaries: [],
     icon: '',
     moduleIcons: {},
-    theme: 'kapi'
+    theme: 'choco'
   };
   let d = null;
   try { d = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
@@ -1022,8 +1180,10 @@ function switchSec(sec) {
   document.querySelectorAll('.bottom-nav button').forEach(n => n.classList.toggle('active', n.dataset.sec === sec));
   document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === 'sec-' + sec));
   if (window.innerWidth <= 720) window.scrollTo(0, 0);
-  if (sec === 'home') refreshQuote();
+  if (sec === 'home') { refreshQuote(); renderHomeAnniversaries(); }
   if (sec === 'diet') { renderDietAll(); }
+  if (sec === 'agenda') { renderAgenda(); }
+  if (sec === 'calendar') { renderCalendar(); }
 }
 document.querySelectorAll('[data-sec]').forEach(el => el.addEventListener('click', () => switchSec(el.dataset.sec)));
 
@@ -2121,26 +2281,6 @@ function renderHobbies() {
 const SCORPIO = {
   name: '天蝎座', range: '10.23 – 11.21', element: '水象', planet: '冥王星', stone: '黄玉 · 碧玺', trait: '深沉 · 直觉 · 执着'
 };
-const MBTI = {
-  INFP: '理想主义者 · 温柔而有深度', INFJ: '提倡者 · 洞察人心', INTP: '逻辑学家 · 热爱思辨', INTJ: '建筑师 · 战略思维',
-  ISFP: '探险家 · 活在当下', ISFJ: '守护者 · 细腻可靠', ISTP: '鉴赏家 · 冷静实操', ISTJ: '物流师 · 严谨负责',
-  ENFP: '竞选者 · 热情洋溢', ENFJ: '主人公 · 鼓舞他人', ENTP: '辩论家 · 机敏善辩', ENTJ: '指挥官 · 天生领袖',
-  ESFP: '表演者 · 活泼有趣', ESFJ: '执政官 · 热心周到', ESTP: '企业家 · 行动派', ESTJ: '总经理 · 高效有序'
-};
-function initMbti() {
-  const sel = document.getElementById('mbti-sel');
-  if (!sel) return;
-  sel.innerHTML = Object.keys(MBTI).map(k => `<option value="${k}">${k}</option>`).join('');
-  sel.value = DB.fortuneMbti || 'INFP';
-  updateMbti();
-}
-function updateMbti() {
-  const k = document.getElementById('mbti-sel').value;
-  DB.fortuneMbti = k; save();
-  const t = document.getElementById('mbti-trait'); if (t) t.textContent = MBTI[k] || '';
-  renderFortune();
-}
-document.getElementById('mbti-sel').addEventListener('change', updateMbti);
 const FORTUNE_COLORS = [
   { n: '酒红', h: '#8B1A2B' }, { n: '墨绿', h: '#1F4E3D' }, { n: '雾霾蓝', h: '#6E8CA0' },
   { n: '暖橙', h: '#E07A3F' }, { n: '米白', h: '#EFE7D6' }, { n: '莓紫', h: '#6B3FA0' },
@@ -2195,8 +2335,7 @@ function renderFortune() {
   document.getElementById('f-weekday').textContent = wd;
   document.getElementById('f-sub').textContent = `${d.getFullYear()}年 · 第 ${weekOfYear} 周`;
   document.getElementById('f-zodiac').innerHTML = [
-    SCORPIO.name, SCORPIO.range, SCORPIO.element, '守护星' + SCORPIO.planet, '幸运石' + SCORPIO.stone, SCORPIO.trait,
-    'MBTI ' + (DB.fortuneMbti || 'INFP') + ' · ' + (MBTI[DB.fortuneMbti] || '')
+    SCORPIO.name, SCORPIO.range, SCORPIO.element, '守护星' + SCORPIO.planet, '幸运石' + SCORPIO.stone, SCORPIO.trait
   ].map(t => `<span class="zchip">${t}</span>`).join('');
 
   const rnd = seededRandom(ds + SCORPIO.name);
@@ -2226,9 +2365,168 @@ function renderFortune() {
 }
 document.getElementById('fortune-date').addEventListener('change', renderFortune);
 
+/* ============ 事情表 ============ */
+function renderAgenda() {
+  const list = document.getElementById('agenda-list'); if (!list) return;
+  const items = (DB.agenda || []).slice().sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  if (!items.length) { list.innerHTML = '<div class="empty">还没有待办，点「＋ 添加」记一件</div>'; return; }
+  list.innerHTML = items.map(it => `
+    <div class="item ${it.done ? 'done' : ''}">
+      <label class="ck"><input type="checkbox" data-ado="${it.id}" ${it.done ? 'checked' : ''}><span></span></label>
+      <div class="info">
+        <div class="title">${escapeHtml(it.text)}</div>
+        <div class="meta">${it.date}</div>
+      </div>
+      <button class="btn-danger btn-sm" data-adel="${it.id}">✕</button>
+    </div>`).join('');
+  list.querySelectorAll('[data-ado]').forEach(c => c.addEventListener('change', () => {
+    const it = DB.agenda.find(x => x.id === c.dataset.ado); if (it) { it.done = c.checked; save(); renderAgenda(); updateBadges(); }
+  }));
+  list.querySelectorAll('[data-adel]').forEach(b => b.addEventListener('click', () => {
+    if (!confirm('删除这条待办？')) return;
+    DB.agenda = DB.agenda.filter(x => x.id !== b.dataset.adel); save(); renderAgenda(); updateBadges();
+  }));
+}
+function openAgendaModal() {
+  const m = document.getElementById('agenda-modal');
+  document.getElementById('agenda-date').value = todayStr();
+  document.getElementById('agenda-text').value = '';
+  m.classList.add('show');
+  setTimeout(() => document.getElementById('agenda-text').focus(), 50);
+}
+function addAgenda() {
+  const date = document.getElementById('agenda-date').value;
+  const text = document.getElementById('agenda-text').value.trim();
+  if (!date) { alert('请选个日期'); return; }
+  if (!text) { alert('写点要做的事吧'); return; }
+  DB.agenda.push({ id: uid(), date, text, done: false });
+  save(); renderAgenda(); renderHomeAgenda(); updateBadges();
+  document.getElementById('agenda-modal').classList.remove('show');
+}
+
+/* ============ 纪念日日历 ============ */
+let anniCalView = (function () { const n = new Date(); return { y: n.getFullYear(), m: n.getMonth() }; })();
+function anniCountdown(mmdd) {
+  const [m, d] = mmdd.split('-').map(Number);
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  const y = now.getFullYear();
+  const thisYear = new Date(y, m - 1, d);
+  const next = thisYear < now ? new Date(y + 1, m - 1, d) : thisYear;
+  const last = thisYear > now ? new Date(y - 1, m - 1, d) : thisYear;
+  const toNext = Math.round((next - now) / 86400000);
+  const sinceLast = Math.round((now - last) / 86400000);
+  if (toNext === 0) return { cls: 'today', text: '今天 🎉' };
+  if (thisYear >= now) return { cls: 'future', text: '还有 ' + toNext + ' 天' };
+  return { cls: 'past', text: '已过 ' + sinceLast + ' 天' };
+}
+function renderCalendar() {
+  const grid = document.getElementById('anni-grid'); if (!grid) return;
+  const { y, m } = anniCalView;
+  const title = document.getElementById('anni-title'); if (title) title.textContent = y + '年' + (m + 1) + '月';
+  const first = new Date(y, m, 1), startDow = first.getDay();
+  const days = new Date(y, m + 1, 0).getDate();
+  const today = new Date();
+  const marked = {};
+  (DB.anniversaries || []).forEach(a => { const mm = +a.date.slice(0, 2), dd = +a.date.slice(3, 5); if (mm === m + 1) marked[dd] = (marked[dd] || 0) + 1; });
+  let cells = '';
+  for (let i = 0; i < startDow; i++) cells += '<div class="cal-cell muted"></div>';
+  for (let d = 1; d <= days; d++) {
+    const isToday = (y === today.getFullYear() && m === today.getMonth() && d === today.getDate());
+    const has = marked[d];
+    const cls = 'cal-cell' + (isToday ? ' today' : '') + (has ? ' mark' : '');
+    const dot = has ? '<i class="cal-dot"></i>' : '';
+    cells += `<div class="${cls}" data-day="${d}">${d}${dot}</div>`;
+  }
+  grid.innerHTML = cells;
+  grid.querySelectorAll('[data-day]').forEach(c => c.addEventListener('click', () => {
+    const mm = String(m + 1).padStart(2, '0'), dd = String(c.dataset.day).padStart(2, '0');
+    openAnniModal(mm + '-' + dd);
+  }));
+  const list = document.getElementById('anni-list');
+  const arr = (DB.anniversaries || []).slice().sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  if (!arr.length) { list.innerHTML = '<div class="empty">还没有纪念日，点「＋ 加纪念日」添加一个</div>'; return; }
+  list.innerHTML = arr.map(a => {
+    const cd = anniCountdown(a.date);
+    const ph = a.photo ? `<div class="anni-thumb" style="background-image:url('${escapeAttr(a.photo)}')"></div>` : `<div class="anni-thumb anni-thumb-empty">📷</div>`;
+    return `<div class="item">
+      ${ph}
+      <div class="info"><div class="title">${escapeHtml(a.name)}</div><div class="meta">每年 ${a.date.replace('-', '月')}日</div></div>
+      <span class="cd-pill ${cd.cls}">${cd.text}</span>
+      <label class="show-toggle"><input type="checkbox" data-ashow="${a.id}" ${a.showHome ? 'checked' : ''}>首页</label>
+      <button class="btn-danger btn-sm" data-adel="${a.id}">✕</button>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('[data-ashow]').forEach(c => c.addEventListener('change', () => {
+    const a = DB.anniversaries.find(x => x.id === c.dataset.ashow); if (a) { a.showHome = c.checked; save(); renderCalendar(); renderHomeAnniversaries(); }
+  }));
+  list.querySelectorAll('[data-adel]').forEach(b => b.addEventListener('click', () => {
+    if (!confirm('删除这个纪念日？')) return;
+    DB.anniversaries = DB.anniversaries.filter(x => x.id !== b.dataset.adel); save(); renderCalendar(); renderHomeAnniversaries(); updateBadges();
+  }));
+}
+function openAnniModal(prefill) {
+  const m = document.getElementById('anni-modal');
+  document.getElementById('anni-name').value = '';
+  document.getElementById('anni-date').value = prefill ? (new Date().getFullYear() + '-' + prefill) : todayStr();
+  const ph = document.getElementById('anni-photo'); if (ph) ph.value = '';
+  m.classList.add('show');
+  setTimeout(() => document.getElementById('anni-name').focus(), 50);
+}
+function addAnni() {
+  const name = document.getElementById('anni-name').value.trim();
+  const val = document.getElementById('anni-date').value;
+  if (!name) { alert('写个名称吧'); return; }
+  if (!val) { alert('选个日期'); return; }
+  const mmdd = val.slice(5);
+  const saveIt = (photo) => {
+    DB.anniversaries.push({ id: uid(), name, date: mmdd, showHome: true, photo: photo || '' });
+    save(); renderCalendar(); renderHomeAnniversaries(); updateBadges();
+    document.getElementById('anni-modal').classList.remove('show');
+  };
+  const phInput = document.getElementById('anni-photo');
+  if (phInput && phInput.files && phInput.files[0]) {
+    fileToDataUrl(phInput.files[0], 480).then(saveIt).catch(() => saveIt(''));
+  } else { saveIt(''); }
+}
+function renderHomeAnniversaries() {
+  const box = document.getElementById('home-anni'); if (!box) return;
+  const sel = (DB.anniversaries || []).filter(a => a.showHome);
+  if (!sel.length) { box.style.display = 'none'; return; }
+  box.style.display = '';
+  sel.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  box.innerHTML = `<div class="home-anni-head" id="home-anni-head">🎉 纪念日<span class="more">查看日历 ›</span></div><div class="home-anni-grid">` +
+    sel.map(a => {
+      const cd = anniCountdown(a.date);
+      const bg = a.photo ? `<div class="anni-photo" style="background-image:url('${escapeAttr(a.photo)}')"></div>` : `<div class="anni-bg"></div>`;
+      return `<div class="anni-card">${bg}<div class="anni-overlay">
+        <div class="anni-name">${escapeHtml(a.name)}</div>
+        <div class="anni-date">每年 ${a.date.replace('-', '月')}日</div>
+        <div class="anni-cd ${cd.cls}">${cd.text}</div>
+      </div></div>`;
+    }).join('') + `</div>`;
+  const h = document.getElementById('home-anni-head'); if (h) h.addEventListener('click', () => switchSec('calendar'));
+}
+
 /* ============ 工具 ============ */
 function escapeHtml(s) { return (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function escapeAttr(s) { return escapeHtml(s).replace(/"/g, '&quot;'); }
+function fileToDataUrl(file, maxW) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxW / img.width);
+        const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(c.toDataURL('image/jpeg', 0.82));
+      };
+      img.onerror = reject; img.src = r.result;
+    };
+    r.onerror = reject; r.readAsDataURL(file);
+  });
+}
 
 /* ============ 角标 ============ */
 function updateBadges() {
@@ -2240,7 +2538,7 @@ function updateBadges() {
   set('badge-shop', DB.shopping.filter(s => !s.done).length);
   set('badge-money', DB.savings.months.length);
   set('badge-hobby', DB.hobbies.records.length);
-  updateHomeBadges();
+  set('badge-agenda', (DB.agenda || []).filter(a => !a.done).length);
 }
 
 /* ============ 小狗卡通图标 ============ */
@@ -2268,7 +2566,9 @@ const NAV_DOGS = {
   shop:    { fur:'#C9B6E0', ear:'#A98FD0', collar:'#E07A9C' },
   money:   { fur:'#E8C067', ear:'#D0A040', collar:'#7E9B7A' },
   hobby:   { fur:'#F2A6A0', ear:'#E07A72', collar:'#A9C4A2' },
-  fortune: { fur:'#B6A9E0', ear:'#9685D0', collar:'#E0B46A' }
+  fortune: { fur:'#B6A9E0', ear:'#9685D0', collar:'#E0B46A' },
+  agenda:  { fur:'#B6D0A0', ear:'#8FB56E', collar:'#E0A85A' },
+  calendar:{ fur:'#A9C7E8', ear:'#7FA8D8', collar:'#C99A6E' }
 };
 function navDog(sec) {
   if (DB.moduleIcons && DB.moduleIcons[sec]) return `<img src="${DB.moduleIcons[sec]}" alt="">`;
@@ -2282,28 +2582,31 @@ function applySecIcons() {
   document.querySelectorAll('.sec-icon').forEach(sp => { const s = sp.dataset.secIcon; if (s && NAV_DOGS[s]) sp.innerHTML = navDog(s); });
 }
 
-/* ============ 首页导航卡片 ============ */
-const HOME_CARDS = [
-  { sec:'diet', tt:'减肥', ds:'断食·三餐·运动', badge:'badge-diet' },
-  { sec:'period', tt:'经期', ds:'周期起止天数', badge:'badge-period' },
-  { sec:'diary', tt:'日记', ds:'心情·天气·文字', badge:'badge-diary' },
-  { sec:'study', tt:'计划', ds:'日程·一周日历', badge:'badge-study' },
-  { sec:'shop', tt:'购物清单', ds:'勾选·批注·价格', badge:'badge-shop' },
-  { sec:'money', tt:'存钱', ds:'生活费·月花销', badge:'badge-money' },
-  { sec:'hobby', tt:'兴趣爱好', ds:'十字绣·拼豆', badge:'badge-hobby' },
-  { sec:'fortune', tt:'运势日历', ds:'天蝎座·幸运色', badge:'badge-fortune' }
-];
+/* ============ 首页（内联：事情表 + 纪念日）============ */
 function renderHome() {
-  const g = document.getElementById('home-grid');
-  if (!g) return;
-  g.innerHTML = HOME_CARDS.map(c => `<div class="home-card" data-sec="${c.sec}">
-    <div class="em">${navDog(c.sec)}</div><div class="tt">${c.tt}</div><div class="ds">${c.ds}</div>
-    <div class="bb" id="hb-${c.badge}"></div></div>`).join('');
-  g.querySelectorAll('[data-sec]').forEach(el => el.addEventListener('click', () => switchSec(el.dataset.sec)));
-  updateHomeBadges();
+  renderHomeAgenda();
+  renderHomeAnniversaries();
 }
-function updateHomeBadges() {
-  HOME_CARDS.forEach(c => { const el = document.getElementById('hb-' + c.badge); if (el) el.textContent = (document.getElementById(c.badge).textContent || ''); });
+function renderHomeAgenda() {
+  const list = document.getElementById('home-agenda-list'); if (!list) return;
+  const items = (DB.agenda || []).slice().sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  if (!items.length) { list.innerHTML = '<div class="empty">还没有待办，点「＋ 添加」记一件</div>'; return; }
+  list.innerHTML = items.map(it => `
+    <div class="item ${it.done ? 'done' : ''}">
+      <label class="ck"><input type="checkbox" data-hado="${it.id}" ${it.done ? 'checked' : ''}><span></span></label>
+      <div class="info">
+        <div class="title">${escapeHtml(it.text)}</div>
+        <div class="meta">${it.date}</div>
+      </div>
+      <button class="btn-danger btn-sm" data-hadel="${it.id}">✕</button>
+    </div>`).join('');
+  list.querySelectorAll('[data-hado]').forEach(c => c.addEventListener('change', () => {
+    const it = DB.agenda.find(x => x.id === c.dataset.hado); if (it) { it.done = c.checked; save(); renderHomeAgenda(); renderAgenda(); updateBadges(); }
+  }));
+  list.querySelectorAll('[data-hadel]').forEach(b => b.addEventListener('click', () => {
+    if (!confirm('删除这条待办？')) return;
+    DB.agenda = DB.agenda.filter(x => x.id !== b.dataset.hadel); save(); renderHomeAgenda(); renderAgenda(); updateBadges();
+  }));
 }
 
 /* ============ 首页增强：日期 / 金句 / 天气 / 打卡 / 主题 ============ */
@@ -2409,9 +2712,9 @@ function refreshQuote() {
   tEl.textContent = '「 ' + DAILY_QUOTES[i] + ' 」';
 }
 const THEMES = [
+  { key: 'choco', name: '薄巧', color: '#B07A4E' },
   { key: 'sage', name: '低饱和绿', color: '#7E9B7A' },
   { key: 'sky', name: '浅蓝白', color: '#5B9BD5' },
-  { key: 'choco', name: '薄巧', color: '#B07A4E' },
   { key: 'pinkgray', name: '白粉灰', color: '#D98AA8' }
 ];
 function applyTheme(key) {
@@ -2453,7 +2756,7 @@ function applyIcon() {
 const MOD_ICON_DEFS = [
   { sec:'home', tt:'首页' }, { sec:'diet', tt:'减肥' }, { sec:'period', tt:'经期' }, { sec:'diary', tt:'日记' },
   { sec:'study', tt:'计划' }, { sec:'shop', tt:'购物' }, { sec:'money', tt:'存钱' },
-  { sec:'hobby', tt:'爱好' }, { sec:'fortune', tt:'运势' }
+  { sec:'hobby', tt:'爱好' }, { sec:'fortune', tt:'运势' }, { sec:'agenda', tt:'事情表' }, { sec:'calendar', tt:'纪念日' }
 ];
 let currentModSec = null;
 function openIconModal() {
@@ -2492,7 +2795,7 @@ if (!DB.fastingTimer) DB.fastingTimer = { phase:'stopped', startTs:null, startTi
 if (!DB.icon) DB.icon = '';
 if (!DB.moduleIcons) DB.moduleIcons = {};
 if (!DB.timers) DB.timers = [];
-if (DB.theme && !THEMES.find(t => t.key === DB.theme)) DB.theme = 'sage';
+if (DB.theme && !THEMES.find(t => t.key === DB.theme)) DB.theme = 'choco';
 // 旧数据没有日期，统一补齐为今天，避免和历史混在一起
 ['breakfast', 'lunch', 'dinner', 'snack'].forEach(k => (DB.meals[k] || []).forEach(m => { if (!m.date) m.date = todayStr(); if (!m.cat) m.cat = k; }));
 (DB.drinks || []).forEach(d => { if (!d.date) d.date = todayStr(); });
@@ -2532,8 +2835,41 @@ tickClock(); setInterval(tickClock, 1000);
 timerTick(); setInterval(timerTick, 1000);
 document.getElementById('fortune-date').value = new Date().toISOString().slice(0, 10);
 renderFortune();
-initMbti();
 updateBadges();
+
+/* ===== 进入页 ===== */
+(function initLanding() {
+  const av = document.getElementById('landing-avatar');
+  if (DB.icon && av) av.innerHTML = `<img src="${DB.icon}" alt="">`;
+  else if (av) av.innerHTML = navDog('home');
+  const ld = document.getElementById('landing');
+  const enter = document.getElementById('landing-enter');
+  if (enter) enter.addEventListener('click', () => { if (ld) ld.classList.add('hide'); });
+})();
+
+/* ===== 事情表 / 纪念日：事件绑定 ===== */
+(function initAgendaAnni() {
+  const hd = document.getElementById('home-date'); if (hd) hd.addEventListener('click', () => switchSec('calendar'));
+  const hw = document.getElementById('home-weekday'); if (hw) hw.addEventListener('click', () => switchSec('calendar'));
+
+  const am = document.getElementById('agenda-modal');
+  document.getElementById('agenda-add').addEventListener('click', openAgendaModal);
+  const ha = document.getElementById('home-agenda-add'); if (ha) ha.addEventListener('click', openAgendaModal);
+  document.getElementById('agenda-cancel').addEventListener('click', () => am.classList.remove('show'));
+  document.getElementById('agenda-ok').addEventListener('click', addAgenda);
+  am.addEventListener('click', e => { if (e.target.id === 'agenda-modal') am.classList.remove('show'); });
+
+  const cm = document.getElementById('anni-modal');
+  document.getElementById('anni-add').addEventListener('click', () => openAnniModal(''));
+  document.getElementById('anni-cancel').addEventListener('click', () => cm.classList.remove('show'));
+  document.getElementById('anni-ok').addEventListener('click', addAnni);
+  cm.addEventListener('click', e => { if (e.target.id === 'anni-modal') cm.classList.remove('show'); });
+
+  document.getElementById('anni-prev').addEventListener('click', () => { anniCalView.m--; if (anniCalView.m < 0) { anniCalView.m = 11; anniCalView.y--; } renderCalendar(); });
+  document.getElementById('anni-next').addEventListener('click', () => { anniCalView.m++; if (anniCalView.m > 11) { anniCalView.m = 0; anniCalView.y++; } renderCalendar(); });
+
+  renderAgenda(); renderCalendar(); renderHomeAnniversaries();
+})();
 </script>
 <script>
   if ('serviceWorker' in navigator) {
