@@ -565,23 +565,26 @@
       <div class="sec-head"><h1><span class="sec-icon" data-sec-icon="diet"></span>减肥打卡</h1><p>断食窗口 · 三餐热量（食物+克数自动估算）· 每日运动</p></div>
 
       <div class="card">
-        <h2>⏱️ 断食计时 <span class="tag">点开始，实时计时</span></h2>
+        <h2>⏱️ 断食记录 <span class="tag">按开始 / 结束，时间可改</span></h2>
         <div style="text-align:center;padding:6px 0">
           <div class="timer-phase" id="fast-phase">未开始</div>
-          <div class="timer-big" id="fast-clock">00:00:00</div>
-          <div class="timer-sub" id="fast-sub">点击「开始禁食」记录空腹时间</div>
+          <div class="timer-big" id="fast-clock">0 时 00 分</div>
+          <div class="timer-sub" id="fast-sub">点「开始禁食」记录起始时刻</div>
         </div>
-        <div class="row" id="fast-start-row" style="justify-content:center;align-items:flex-end;gap:8px;margin-top:6px">
-          <div class="field" style="text-align:left;margin:0"><label>禁食开始时间（日期+时刻）</label><input type="datetime-local" id="fast-start-dt"></div>
-        </div>
-        <div class="row" style="justify-content:center;margin-top:4px">
+        <div class="row" style="justify-content:center;gap:8px;margin-top:6px">
           <button class="btn-primary" id="fast-toggle">开始禁食</button>
-          <button class="btn-ghost btn-sm" id="fast-reset">重置</button>
+          <button class="btn-ghost btn-sm" id="fast-reset">清空记录</button>
         </div>
-        <div class="row" style="justify-content:center;align-items:center;margin-top:14px">
-          <span class="stat"><span class="num" id="fast-today">0</span><span class="lbl">今日累计禁食(分)</span></span>
-          <span class="stat"><span class="num" id="fast-eatcount">0</span><span class="lbl">今日进食次数</span></span>
+        <div class="hint">到点按开始 / 结束即可；若漏按，可先改下面的时间再按。</div>
+        <div class="row" style="margin-top:12px">
+          <div class="field"><label>开始时间（可调整）</label><input type="datetime-local" id="fast-start"></div>
+          <div class="field"><label>结束时间（可调整）</label><input type="datetime-local" id="fast-end"></div>
         </div>
+
+        <h2 style="margin-top:18px">🍽️ 16:8 今日打卡</h2>
+        <div class="progress"><i id="fast-168-bar"></i></div>
+        <div id="fast-168-status" style="margin:6px 0 10px;font-weight:600;font-size:14px"></div>
+        <div class="hint">目标：今日断食累计 ≥ 16 小时，还差多久达成都会显示在这里。</div>
         <div class="list" id="fast-log" style="margin-top:10px"></div>
       </div>
 
@@ -961,6 +964,9 @@ let DB = load();
 function load() {
   const def = {
     fastingTimer: { phase: 'stopped', startTs: null, startTime: '', segments: [] },
+    fasts: [],
+    fastActive: false,
+    fastStart: '',
     meals: { breakfast: [], lunch: [], dinner: [], snack: [] },
     exercises: [],
     periods: [],
@@ -993,6 +999,16 @@ function load() {
   out.purchases = d.purchases || [];
   out.timers = d.timers || [];
   out.fastingTimer = d.fastingTimer || def.fastingTimer;
+  out.fasts = d.fasts || [];
+  out.fastActive = d.fastActive || false;
+  out.fastStart = d.fastStart || '';
+  // 迁移旧的实时断食段 -> 手动断食记录
+  if (out.fastingTimer && out.fastingTimer.segments && out.fastingTimer.segments.length) {
+    out.fastingTimer.segments.filter(s => s.type === 'fast' && s.date && s.start && s.end).forEach(s => {
+      out.fasts.push({ id: uid(), start: s.date + 'T' + s.start, end: s.date + 'T' + s.end, mins: s.mins || 0, date: s.date });
+    });
+    out.fastingTimer = { phase: 'stopped', startTs: null, startTime: '', segments: [] };
+  }
   return out;
 }
 function save() {
@@ -1010,11 +1026,11 @@ function switchSec(sec) {
   document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === 'sec-' + sec));
   if (window.innerWidth <= 720) window.scrollTo(0, 0);
   if (sec === 'home') refreshQuote();
-  if (sec === 'diet') renderWeight();
+  if (sec === 'diet') { renderWeight(); renderFasts(); }
 }
 document.querySelectorAll('[data-sec]').forEach(el => el.addEventListener('click', () => switchSec(el.dataset.sec)));
 
-/* ============ 减肥：断食计时（实时状态机）============ */
+/* ============ 减肥：断食记录（开始/结束 + 可调整时间 + 16:8）============ */
 function fmtDur(ms) {
   const s = Math.floor(ms / 1000);
   const hh = String(Math.floor(s / 3600)).padStart(2, '0');
@@ -1022,59 +1038,91 @@ function fmtDur(ms) {
   const ss = String(s % 60).padStart(2, '0');
   return hh + ':' + mm + ':' + ss;
 }
-function fastNow() { const t = new Date(); return String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0'); }
-function fmtDT(ts) { const d = new Date(ts); return String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
 function nowLocalStr() { const d = new Date(); const off = d.getTimezoneOffset() * 60000; return new Date(d.getTime() - off).toISOString().slice(0, 16); }
-function fastTick() {
-  const f = DB.fastingTimer;
-  if (f.phase === 'stopped' || f.startTs == null) { const c = document.getElementById('fast-clock'); if (c) c.textContent = '00:00:00'; return; }
-  const c = document.getElementById('fast-clock'); if (c) c.textContent = fmtDur(Date.now() - f.startTs);
+function fmtHm(mins) {
+  mins = Math.max(0, Math.round(mins));
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return h + ' 时 ' + String(m).padStart(2, '0') + ' 分';
 }
-function fastRender() {
-  const f = DB.fastingTimer;
-  const ph = document.getElementById('fast-phase');
-  const tg = document.getElementById('fast-toggle');
-  const sub = document.getElementById('fast-sub');
-  if (!ph) return;
-  if (f.phase === 'stopped') { ph.textContent = '未开始'; ph.className = 'timer-phase'; tg.textContent = '开始禁食'; sub.textContent = '点击「开始禁食」记录空腹时间'; }
-  else if (f.phase === 'fasting') { ph.textContent = '🕐 禁食中'; ph.className = 'timer-phase fasting'; tg.textContent = '结束（开始进食）'; sub.textContent = '已禁食时间实时更新，到点吃饭就点结束'; }
-  else { ph.textContent = '🍽️ 进食中'; ph.className = 'timer-phase eating'; tg.textContent = '结束（开始禁食）'; sub.textContent = '进食计时中，吃完点结束回到禁食'; }
-  const sr = document.getElementById('fast-start-row');
-  if (sr) sr.style.display = (f.phase === 'stopped') ? '' : 'none';
-  if (f.phase !== 'stopped' && f.startTime) sub.textContent = '始于 ' + f.startTime + '，实时更新中';
-  const today = todayStr();
-  const segs = f.segments.filter(s => s.date === today);
-  const fastMins = segs.filter(s => s.type === 'fast').reduce((a, b) => a + b.mins, 0);
-  const eatCount = segs.filter(s => s.type === 'eat').length;
-  document.getElementById('fast-today').textContent = Math.round(fastMins);
-  document.getElementById('fast-eatcount').textContent = eatCount;
-  const log = document.getElementById('fast-log');
-  const recent = f.segments.slice(-10).reverse();
-  log.innerHTML = recent.length
-    ? recent.map(s => `<div class="item" style="font-size:13px"><div class="info"><div class="title">${s.type === 'fast' ? '🕐 禁食' : '🍽️ 进食'} · ${s.mins} 分钟</div><div class="meta">${s.start} - ${s.end}</div></div></div>`).join('')
-    : '<div class="empty">还没有记录</div>';
-  fastTick();
-}
+function fastDateOf(dtStr) { return dtStr ? dtStr.slice(0, 10) : ''; }
 function fastToggle() {
-  const f = DB.fastingTimer;
-  const now = Date.now();
-  const ts = fmtDT(now);
-  if (f.phase === 'stopped') {
-    const v = document.getElementById('fast-start-dt').value;
-    let startTs = now;
-    if (v) { const d = new Date(v); if (!isNaN(d.getTime())) startTs = d.getTime(); }
-    f.phase = 'fasting'; f.startTs = startTs; f.startTime = fmtDT(startTs);
-  }
-  else if (f.phase === 'fasting') {
-    f.segments.push({ type: 'fast', date: todayStr(new Date(f.startTs)), start: f.startTime, end: ts, mins: Math.max(1, Math.round((now - f.startTs) / 60000)) });
-    f.phase = 'eating'; f.startTs = now; f.startTime = ts;
+  if (!DB.fastActive) {
+    let v = document.getElementById('fast-start').value;
+    if (!v) { v = nowLocalStr(); document.getElementById('fast-start').value = v; }
+    DB.fastActive = true; DB.fastStart = v;
   } else {
-    f.segments.push({ type: 'eat', date: todayStr(), start: f.startTime, end: ts, mins: Math.max(1, Math.round((now - f.startTs) / 60000)) });
-    f.phase = 'fasting'; f.startTs = now; f.startTime = ts;
+    let v = document.getElementById('fast-end').value;
+    if (!v) { v = nowLocalStr(); document.getElementById('fast-end').value = v; }
+    const st = new Date(DB.fastStart), et = new Date(v);
+    if (isNaN(st.getTime()) || isNaN(et.getTime()) || et <= st) { alert('结束时间须晚于开始时间，请调整结束时间'); return; }
+    DB.fasts.push({ id: uid(), start: DB.fastStart, end: v, mins: Math.round((et - st) / 60000), date: todayStr(st) });
+    DB.fastActive = false; DB.fastStart = '';
   }
-  save(); fastRender();
+  save(); renderFasts();
 }
-function fastReset() { if (!confirm('确定重置断食计时？已记录的历史会清空')) return; DB.fastingTimer = { phase: 'stopped', startTs: null, startTime: '', segments: [] }; save(); fastRender(); }
+function fastReset() {
+  if (!confirm('清空所有断食记录？此操作不可恢复')) return;
+  DB.fasts = []; DB.fastActive = false; DB.fastStart = '';
+  save(); renderFasts();
+}
+function fastTick() {
+  const el = document.getElementById('fast-clock');
+  if (!el) return;
+  if (DB.fastActive && DB.fastStart) {
+    const st = new Date(DB.fastStart);
+    if (!isNaN(st.getTime())) { el.textContent = fmtHm((Date.now() - st.getTime()) / 60000); return; }
+  }
+  if (!DB.fastActive) {
+    const t = todayStr();
+    const todayFasts = DB.fasts.filter(f => fastDateOf(f.start) === t);
+    const last = todayFasts[todayFasts.length - 1];
+    el.textContent = last ? fmtHm(num(last.mins)) : '0 时 00 分';
+  }
+}
+function renderFasts() {
+  const tg = document.getElementById('fast-toggle');
+  const ph = document.getElementById('fast-phase');
+  const sub = document.getElementById('fast-sub');
+  if (!tg) return;
+  if (DB.fastActive) {
+    ph.textContent = '🕐 禁食中'; ph.className = 'timer-phase fasting';
+    tg.textContent = '结束禁食';
+    sub.textContent = '始于 ' + (DB.fastStart || '').replace('T', ' ') + '，点「结束禁食」记录时刻';
+  } else {
+    ph.textContent = '未开始'; ph.className = 'timer-phase';
+    tg.textContent = '开始禁食';
+    sub.textContent = '点「开始禁食」记录起始时刻（时间可改）';
+  }
+  const t = todayStr();
+  const todayFasts = DB.fasts.filter(f => fastDateOf(f.start) === t);
+  const fastMins = todayFasts.reduce((a, b) => a + (num(b.mins) || 0), 0);
+  const GOAL = 16 * 60;
+  const bar = document.getElementById('fast-168-bar');
+  if (bar) bar.style.width = Math.min(100, fastMins / GOAL * 100) + '%';
+  const stEl = document.getElementById('fast-168-status');
+  if (stEl) {
+    if (fastMins >= GOAL) { stEl.innerHTML = '✅ 今日已达成 16:8'; stEl.style.color = 'var(--green, #2e9e5b)'; }
+    else { stEl.innerHTML = '⏳ 还差 ' + fmtHm(GOAL - fastMins) + ' 达成 16:8'; stEl.style.color = 'var(--amber, #d98a00)'; }
+  }
+  fastTick();
+  const log = document.getElementById('fast-log');
+  if (!log) return;
+  if (!DB.fasts.length) { log.innerHTML = '<div class="empty">还没有断食记录，点「开始禁食」即可</div>'; return; }
+  log.innerHTML = DB.fasts.slice().reverse().map(f => `
+    <div class="item">
+      <div class="info">
+        <div class="title">🕐 ${fmtHm(num(f.mins))}</div>
+        <div class="meta">${escapeHtml((f.start || '').replace('T', ' '))} → ${escapeHtml((f.end || '').replace('T', ' '))}</div>
+      </div>
+      <button class="btn-danger btn-sm" data-fdel="${f.id}">✕</button>
+    </div>`).join('');
+  log.querySelectorAll('[data-fdel]').forEach(b => b.addEventListener('click', () => {
+    if (!confirm('删除这条断食记录？')) return;
+    DB.fasts = DB.fasts.filter(x => x.id !== b.dataset.fdel);
+    save(); renderFasts();
+  }));
+}
 document.getElementById('fast-toggle').addEventListener('click', fastToggle);
 document.getElementById('fast-reset').addEventListener('click', fastReset);
 setInterval(fastTick, 1000);
@@ -2474,9 +2522,9 @@ renderSavings();
 renderHobbyTabs();
 migrateHobbyCosts();
 renderHobbies();
-fastRender();
+renderFasts();
 renderWeight();
-const fsdt = document.getElementById('fast-start-dt'); if (fsdt) fsdt.value = nowLocalStr();
+const fstart = document.getElementById('fast-start'); if (fstart) fstart.value = nowLocalStr();
 renderHome();
 applyNavDogs();
 applySecIcons();
