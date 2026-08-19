@@ -95,6 +95,14 @@
   }
   .card h2 .tag { font-size: 12px; font-weight: 500; color: var(--muted); }
 
+  /* ===== 卡片可折叠（点标题展开/合上）===== */
+  .card-head { cursor: pointer; user-select: none; }
+  .caret { margin-left: auto; font-size: 13px; color: var(--muted); transition: transform .2s; flex-shrink: 0; }
+  .card.collapsed > *:not(.card-head),
+  .home-block.collapsed > *:not(.card-head),
+  .home-anni.collapsed > *:not(.card-head) { display: none !important; }
+  .collapsed .caret { transform: rotate(-90deg); }
+
   label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
   input[type=text], input[type=time], input[type=date], input[type=month], input[type=datetime-local], input[type=file],
   input[type=number], textarea, select {
@@ -233,6 +241,7 @@
   /* ===== 断食计时器 ===== */
   .timer-phase { display: inline-block; font-weight: 700; padding: 4px 12px; border-radius: 99px; background: var(--brand-soft); color: var(--brand); font-size: 14px; }
   .timer-phase.fasting { background: #fdecec; color: #d9534f; }
+  .timer-phase.eating { background: #e9f4ec; color: #2e9e5b; }
   .timer-phase.eating { background: #eaf3e8; color: var(--green); }
   .timer-big { font-size: 46px; font-weight: 800; letter-spacing: 1px; margin: 8px 0 4px; font-variant-numeric: tabular-nums; }
   .timer-sub { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
@@ -263,7 +272,6 @@
   .dog { display: flex; flex-direction: column; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; box-shadow: var(--shadow); width: 96px; }
   .dog-face { width: 60px; height: 60px; }
   .dog-name { font-size: 13px; font-weight: 700; color: var(--brand); }
-  .theme-switch { margin: 16px 0 4px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .ts-label { font-size: 14px; font-weight: 700; color: var(--ink); }
   .ts-chips { display: flex; gap: 8px; flex-wrap: wrap; }
   .ts-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--card); color: var(--muted); border-radius: 99px; padding: 6px 14px; font-size: 13px; cursor: pointer; font-family: inherit; transition: .15s; }
@@ -447,6 +455,14 @@
   .im-cell .pic img { width: 100%; height: 100%; object-fit: contain; }
   .im-cell .nm { font-size: 11px; color: var(--muted); }
   .im-tip { font-size: 11.5px; color: var(--muted); line-height: 1.6; border-top: 1px solid var(--line); padding-top: 12px; }
+  /* ===== 头像菜单（换头像/换图标/换个风格）===== */
+  .avm-box { max-width: 340px; }
+  .avm-btn { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; background: var(--tint); border: 1px solid var(--line); color: var(--ink); border-radius: 13px; padding: 13px 15px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-bottom: 10px; transition: .15s; }
+  .avm-btn:hover { border-color: var(--brand); }
+  .avm-theme { margin-top: 4px; border-top: 1px dashed var(--line); padding-top: 12px; }
+  .avm-theme-label { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+  .avm-theme .ts-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .home-avatar, .brand .logo, .landing-avatar { cursor: pointer; }
   /* 自定义上传图标：固定尺寸，防止大图撑大布局 */
   .nav-item .emoji img, .bottom-nav button span img { width: 22px; height: 22px; object-fit: cover; border-radius: 6px; display: block; }
   .sec-icon img { width: 30px; height: 30px; object-fit: cover; border-radius: 8px; vertical-align: middle; margin-right: 8px; display: inline-block; }
@@ -458,6 +474,16 @@
   .weight-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
   .weight-slval { font-size: 16px; font-weight: 700; min-width: 48px; text-align: right; }
   #w-slider { accent-color: var(--brand); }
+  .weight-stats { display: flex; gap: 8px; margin: 10px 0 2px; }
+  .weight-stats .ws { flex: 1; background: var(--tint); border: 1px solid var(--line); border-radius: 12px; padding: 8px 4px; text-align: center; }
+  .weight-stats .ws b { display: block; font-size: 19px; font-weight: 800; color: var(--ink); }
+  .weight-stats .ws span { font-size: 11px; color: var(--muted); }
+  .weight-stats .ws.hl { background: var(--brand-soft); border-color: var(--brand); }
+  .weight-stats .ws.hl b { color: var(--brand); }
+  .weight-init-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+  .weight-init-row label { margin: 0; font-size: 13px; color: var(--muted); flex-shrink: 0; }
+  .weight-init-row input { flex: 1; min-width: 0; }
+  .weight-init-row .unit { font-size: 13px; color: var(--muted); flex-shrink: 0; }
   .weight-chart { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line); }
 
   /* ===== 进入页（头像 + 进入按钮）===== */
@@ -587,6 +613,18 @@
         <div class="im-tip">图片建议正方形，会自动压缩。换完后若已装到桌面，重新「添加到主屏幕」即可更新。</div>
       </div>
     </div>
+    <!-- 点头像弹出的小菜单：换头像 / 换图标 / 换个风格 -->
+    <div class="icon-modal" id="avatar-menu">
+      <div class="icon-modal-box avm-box">
+        <div class="im-head"><span>👤 头像与外观</span><button class="im-close" id="avm-close">✕</button></div>
+        <button class="avm-btn" id="avm-avatar">🖼️ 换头像（App 图标）</button>
+        <button class="avm-btn" id="avm-icons">🎨 换模块图标</button>
+        <div class="avm-theme">
+          <div class="avm-theme-label">🎨 换个风格</div>
+          <div class="ts-chips" id="avm-theme-chips"></div>
+        </div>
+      </div>
+    </div>
     <div class="nav-item active" data-sec="home"><span class="emoji">🏠</span><span class="txt">首页</span></div>
     <div class="nav-item" data-sec="diet"><span class="emoji">🥗</span><span class="txt">减肥</span><span class="badge" id="badge-diet"></span></div>
     <div class="nav-item" data-sec="period"><span class="emoji">🌸</span><span class="txt">经期</span><span class="badge" id="badge-period"></span></div>
@@ -650,10 +688,6 @@
           </div>
           <div class="list" id="tm-list"></div>
         </div>
-        <div class="theme-switch">
-          <span class="ts-label">🎨 换个风格</span>
-          <div class="ts-chips" id="theme-chips"></div>
-        </div>
       </div>
       <div class="home-block">
         <div class="home-block-head"><span>📝 事情表</span><button class="btn-primary btn-sm" id="home-agenda-add">＋ 添加</button></div>
@@ -677,7 +711,7 @@
       </div>
 
       <div class="card">
-        <h2>⏱️ 断食记录 <span class="tag">按开始 / 结束，时间可改</span></h2>
+        <h2>⏱️ 断食记录 <span class="tag">禁食 → 进食 → 结束</span></h2>
         <div style="text-align:center;padding:6px 0">
           <div class="timer-phase" id="fast-phase">未开始</div>
           <div class="timer-big" id="fast-clock">0 时 00 分</div>
@@ -687,10 +721,10 @@
           <button class="btn-primary" id="fast-toggle">开始禁食</button>
           <button class="btn-ghost btn-sm" id="fast-reset">清空记录</button>
         </div>
-        <div class="hint">到点按开始 / 结束即可；若漏按，可先改下面的时间再按。</div>
+        <div class="hint">点「开始禁食」→ 点「停止禁食」开始计「吃了多久」→ 点「结束」结算本段禁食多久。若漏按，可先改下方时间再操作。</div>
         <div class="row" style="margin-top:12px">
-          <div class="field"><label>开始时间（可调整）</label><input type="datetime-local" id="fast-start"></div>
-          <div class="field"><label>结束时间（可调整）</label><input type="datetime-local" id="fast-end"></div>
+          <div class="field"><label>禁食开始时间（可调整）</label><input type="datetime-local" id="fast-start"></div>
+          <div class="field"><label>进食开始时间（点停止时记录）</label><input type="datetime-local" id="fast-end"></div>
         </div>
 
         <div class="list" id="fast-log" style="margin-top:10px"></div>
@@ -701,6 +735,16 @@
         <div style="text-align:center;padding:6px 0">
           <div class="weight-now"><span id="w-cur">50.0</span><span class="unit">kg</span></div>
           <div class="weight-sub" id="w-sub">初始 50.0 kg　|　较初始 0.0 kg</div>
+        </div>
+        <div class="weight-stats">
+          <div class="ws"><b id="w-init">50.0</b><span>初始(最高)</span></div>
+          <div class="ws"><b id="w-cur2">50.0</b><span>当前</span></div>
+          <div class="ws hl"><b id="w-drop">0.0</b><span>距最高已降</span></div>
+        </div>
+        <div class="weight-init-row">
+          <label>初始（最高）体重</label>
+          <input type="number" id="w-init-input" min="30" max="200" step="0.1">
+          <span class="unit">kg</span>
         </div>
         <div class="row" style="align-items:center;gap:10px;margin-top:6px">
           <input type="range" id="w-slider" min="30" max="120" step="0.1" value="50" style="flex:1">
@@ -1120,7 +1164,9 @@ function load() {
     fastingTimer: { phase: 'stopped', startTs: null, startTime: '', segments: [] },
     fasts: [],
     fastActive: false,
+    fastPhase: 'idle',
     fastStart: '',
+    fastEatStart: '',
     meals: { breakfast: [], lunch: [], dinner: [], snack: [] },
     exercises: [],
     periods: [],
@@ -1156,7 +1202,9 @@ function load() {
   out.fastingTimer = d.fastingTimer || def.fastingTimer;
   out.fasts = d.fasts || [];
   out.fastActive = d.fastActive || false;
+  out.fastPhase = d.fastPhase || 'idle';
   out.fastStart = d.fastStart || '';
+  out.fastEatStart = d.fastEatStart || '';
   // 迁移旧的实时断食段 -> 手动断食记录
   if (out.fastingTimer && out.fastingTimer.segments && out.fastingTimer.segments.length) {
     out.fastingTimer.segments.filter(s => s.type === 'fast' && s.date && s.start && s.end).forEach(s => {
@@ -1203,33 +1251,66 @@ function fmtHm(mins) {
   return h + ' 时 ' + String(m).padStart(2, '0') + ' 分';
 }
 function fastDateOf(dtStr) { return dtStr ? dtStr.slice(0, 10) : ''; }
+let fastEditingId = null;
 function fastToggle() {
-  if (!DB.fastActive) {
-    let v = document.getElementById('fast-start').value;
-    if (!v) { v = nowLocalStr(); document.getElementById('fast-start').value = v; }
-    DB.fastActive = true; DB.fastStart = v;
-  } else {
-    let v = document.getElementById('fast-end').value;
-    if (!v) { v = nowLocalStr(); document.getElementById('fast-end').value = v; }
-    const st = new Date(DB.fastStart), et = new Date(v);
-    if (isNaN(st.getTime()) || isNaN(et.getTime()) || et <= st) { alert('结束时间须晚于开始时间，请调整结束时间'); return; }
-    DB.fasts.push({ id: uid(), start: DB.fastStart, end: v, mins: Math.round((et - st) / 60000), date: todayStr(st) });
-    DB.fastActive = false; DB.fastStart = '';
+  // 编辑模式：保存对已有记录的修改
+  if (fastEditingId) {
+    const f = DB.fasts.find(x => x.id === fastEditingId);
+    if (f) {
+      const st = new Date(document.getElementById('fast-start').value);
+      const eat = new Date(document.getElementById('fast-end').value);
+      if (isNaN(st.getTime()) || isNaN(eat.getTime()) || eat <= st) { alert('进食开始须晚于禁食开始，请调整时间'); return; }
+      f.start = document.getElementById('fast-start').value;
+      f.eatStart = document.getElementById('fast-end').value;
+      f.fastMins = Math.round((eat - st) / 60000);
+      f.date = todayStr(st);
+      if (f.start && f.eatStart && f.end) { const e = new Date(f.end); if (!isNaN(e.getTime()) && e > eat) f.eatMins = Math.round((e - eat) / 60000); }
+    }
+    fastEditingId = null;
+    document.getElementById('fast-start').value = ''; document.getElementById('fast-end').value = '';
+    save(); renderFasts();
+    return;
+  }
+  const phase = DB.fastPhase || 'idle';
+  const startEl = document.getElementById('fast-start');
+  const endEl = document.getElementById('fast-end');
+  if (phase === 'idle') {
+    let v = startEl.value;
+    if (!v) { v = nowLocalStr(); startEl.value = v; }
+    DB.fastActive = true; DB.fastPhase = 'fasting'; DB.fastStart = v; DB.fastEatStart = '';
+  } else if (phase === 'fasting') {
+    if (startEl.value) DB.fastStart = startEl.value;
+    let v = endEl.value;
+    if (!v) { v = nowLocalStr(); endEl.value = v; }
+    DB.fastEatStart = v; DB.fastPhase = 'eating';
+  } else if (phase === 'eating') {
+    if (startEl.value) DB.fastStart = startEl.value;
+    if (endEl.value) DB.fastEatStart = endEl.value;
+    const st = new Date(DB.fastStart), eat = new Date(DB.fastEatStart);
+    const endV = nowLocalStr();
+    const fastMs = eat - st, eatMs = (new Date(endV)) - eat;
+    if (fastMs <= 0) { alert('进食开始时间须晚于禁食开始时间，请调整时间'); return; }
+    DB.fasts.push({ id: uid(), start: DB.fastStart, eatStart: DB.fastEatStart, end: endV, fastMins: Math.round(fastMs / 60000), eatMins: Math.round(eatMs / 60000), date: todayStr(st) });
+    DB.fastActive = false; DB.fastPhase = 'idle'; DB.fastStart = ''; DB.fastEatStart = '';
+    startEl.value = ''; endEl.value = '';
   }
   save(); renderFasts();
 }
 function fastReset() {
   if (!confirm('清空所有断食记录？此操作不可恢复')) return;
-  DB.fasts = []; DB.fastActive = false; DB.fastStart = '';
+  DB.fasts = []; DB.fastActive = false; DB.fastPhase = 'idle'; DB.fastStart = ''; DB.fastEatStart = '';
+  fastEditingId = null;
+  document.getElementById('fast-start').value = ''; document.getElementById('fast-end').value = '';
   save(); renderFasts();
 }
 function fastTick() {
   const el = document.getElementById('fast-clock');
   if (!el) return;
-  if (DB.fastActive && DB.fastStart) {
-    const st = new Date(DB.fastStart);
-    if (!isNaN(st.getTime())) { el.textContent = fmtHm((Date.now() - st.getTime()) / 60000); return; }
-  }
+  const phase = DB.fastPhase || 'idle';
+  let ref = null;
+  if (phase === 'fasting' && DB.fastStart) ref = new Date(DB.fastStart);
+  else if (phase === 'eating' && DB.fastEatStart) ref = new Date(DB.fastEatStart);
+  if (ref && !isNaN(ref.getTime())) { el.textContent = fmtHm((Date.now() - ref.getTime()) / 60000); return; }
   el.textContent = '0 时 00 分';
 }
 function renderFasts() {
@@ -1237,17 +1318,26 @@ function renderFasts() {
   const ph = document.getElementById('fast-phase');
   const sub = document.getElementById('fast-sub');
   if (!tg) return;
-  if (DB.fastActive) {
-    ph.textContent = '🕐 禁食中'; ph.className = 'timer-phase fasting';
-    tg.textContent = '结束禁食';
-    sub.textContent = '始于 ' + (DB.fastStart || '').replace('T', ' ') + '，点「结束禁食」记录时刻';
-  } else {
+  const phase = DB.fastPhase || 'idle';
+  if (fastEditingId) {
+    ph.textContent = '✏️ 修改中'; ph.className = 'timer-phase';
+    tg.textContent = '保存修改';
+    sub.textContent = '调整下方「禁食开始 / 进食开始」时间，点「保存修改」更新这条记录';
+  } else if (phase === 'idle') {
     ph.textContent = '未开始'; ph.className = 'timer-phase';
     tg.textContent = '开始禁食';
-    sub.textContent = '点「开始禁食」记录起始时刻（时间可改）';
+    sub.textContent = '点「开始禁食」记录禁食起始时刻（时间可改）';
+  } else if (phase === 'fasting') {
+    ph.textContent = '🕐 禁食中'; ph.className = 'timer-phase fasting';
+    tg.textContent = '停止禁食（开始进食）';
+    sub.textContent = '始于 ' + (DB.fastStart || '').replace('T', ' ') + '，点上方按钮开始计算「吃了多久」';
+  } else if (phase === 'eating') {
+    ph.textContent = '🍽️ 进食中'; ph.className = 'timer-phase eating';
+    tg.textContent = '结束（计算禁食）';
+    sub.textContent = '进食始于 ' + (DB.fastEatStart || '').replace('T', ' ') + '，点上方按钮结算本段禁食';
   }
-  const t = dietViewDate;
-  const todayFasts = DB.fasts.filter(f => fastDateOf(f.start) === t);
+  if (phase === 'fasting') { if (!document.getElementById('fast-start').value) document.getElementById('fast-start').value = DB.fastStart; }
+  if (phase === 'eating') { if (!document.getElementById('fast-start').value) document.getElementById('fast-start').value = DB.fastStart; if (!document.getElementById('fast-end').value) document.getElementById('fast-end').value = DB.fastEatStart; }
   fastTick();
   const log = document.getElementById('fast-log');
   if (!log) return;
@@ -1255,14 +1345,25 @@ function renderFasts() {
   log.innerHTML = DB.fasts.slice().reverse().map(f => `
     <div class="item">
       <div class="info">
-        <div class="title">🕐 ${fmtHm(num(f.mins))}</div>
-        <div class="meta">${escapeHtml((f.start || '').replace('T', ' '))} → ${escapeHtml((f.end || '').replace('T', ' '))}</div>
+        <div class="title">🕐 禁食 ${fmtHm(num(f.fastMins))}　🍽️ 进食 ${fmtHm(num(f.eatMins))}</div>
+        <div class="meta">${escapeHtml((f.start || '').replace('T', ' '))} → 进食 ${escapeHtml((f.eatStart || '').replace('T', ' '))} → ${escapeHtml((f.end || '').replace('T', ' '))}</div>
       </div>
-      <button class="btn-danger btn-sm" data-fdel="${f.id}">✕</button>
+      <div class="acts">
+        <button class="btn-ghost btn-sm" data-fedit="${f.id}">修改</button>
+        <button class="btn-danger btn-sm" data-fdel="${f.id}">✕</button>
+      </div>
     </div>`).join('');
+  log.querySelectorAll('[data-fedit]').forEach(b => b.addEventListener('click', () => {
+    const f = DB.fasts.find(x => x.id === b.dataset.fedit); if (!f) return;
+    fastEditingId = f.id;
+    document.getElementById('fast-start').value = f.start || '';
+    document.getElementById('fast-end').value = f.eatStart || '';
+    renderFasts();
+  }));
   log.querySelectorAll('[data-fdel]').forEach(b => b.addEventListener('click', () => {
     if (!confirm('删除这条断食记录？')) return;
     DB.fasts = DB.fasts.filter(x => x.id !== b.dataset.fdel);
+    if (fastEditingId === b.dataset.fdel) fastEditingId = null;
     save(); renderFasts();
   }));
 }
@@ -1275,11 +1376,20 @@ function renderWeight() {
   const w = DB.weight;
   const view = dietViewDate;
   const rec = w.records.find(r => r.date === view);
-  const cur = rec ? num(rec.value) : num(w.initial);
   const init = num(w.initial);
-  const curEl = document.getElementById('w-cur'); if (curEl) curEl.textContent = rec ? cur.toFixed(1) : '—';
+  const sorted = w.records.slice().sort((a, b) => b.date.localeCompare(a.date));
+  const latest = sorted.length ? num(sorted[0].value) : init;
+  const cur = rec ? num(rec.value) : (sorted.length ? latest : init);
+  const allVals = w.records.map(r => num(r.value)).concat([init]);
+  const highest = Math.max.apply(null, allVals);
+  const drop = Math.max(0, highest - cur);
+  const curEl = document.getElementById('w-cur'); if (curEl) curEl.textContent = (rec || sorted.length) ? cur.toFixed(1) : '—';
   const subEl = document.getElementById('w-sub');
-  if (subEl) subEl.textContent = rec ? (`${view} ${cur.toFixed(1)} kg　|　较初始 ${(cur - init).toFixed(1)} kg`) : (`${view} 暂无记录　|　初始 ${init.toFixed(1)} kg`);
+  if (subEl) subEl.textContent = `${view} ${rec ? cur.toFixed(1) + ' kg' : '暂无记录'}　|　初始 ${init.toFixed(1)} kg`;
+  const initEl = document.getElementById('w-init'); if (initEl) initEl.textContent = init.toFixed(1);
+  const cur2El = document.getElementById('w-cur2'); if (cur2El) cur2El.textContent = latest.toFixed(1);
+  const dropEl = document.getElementById('w-drop'); if (dropEl) dropEl.textContent = drop.toFixed(1);
+  const initInput = document.getElementById('w-init-input'); if (initInput && document.activeElement !== initInput) initInput.value = init;
   const slider = document.getElementById('w-slider'); if (slider) slider.value = cur;
   const slval = document.getElementById('w-slval'); if (slval) slval.textContent = cur.toFixed(1);
   const btn = document.getElementById('w-record'); if (btn) btn.textContent = (view === todayStr()) ? '记录今日体重' : '记录该日体重';
@@ -1294,6 +1404,7 @@ function renderWeight() {
   drawWeightChart();
 }
 document.getElementById('w-slider').addEventListener('input', () => { const v = num(document.getElementById('w-slider').value); const sv = document.getElementById('w-slval'); if (sv) sv.textContent = v.toFixed(1); });
+document.getElementById('w-init-input').addEventListener('input', () => { const v = num(document.getElementById('w-init-input').value); if (!v) return; DB.weight.initial = v; save(); renderWeight(); });
 document.getElementById('w-record').addEventListener('click', () => {
   const v = num(document.getElementById('w-slider').value);
   if (!v) { alert('请先拖动滑块选择体重'); return; }
@@ -2531,7 +2642,7 @@ function fileToDataUrl(file, maxW) {
 /* ============ 角标 ============ */
 function updateBadges() {
   const set = (id, n) => { const b = document.getElementById(id); if (n > 0) { b.textContent = n; b.classList.add('show'); } else b.classList.remove('show'); };
-  set('badge-diet', DB.meals.breakfast.length + DB.meals.lunch.length + DB.meals.dinner.length + DB.meals.snack.length + DB.drinks.length + (DB.fastingTimer.phase !== 'stopped' ? 1 : 0) + DB.exercises.length);
+  set('badge-diet', DB.meals.breakfast.length + DB.meals.lunch.length + DB.meals.dinner.length + DB.meals.snack.length + DB.drinks.length + (DB.fastPhase && DB.fastPhase !== 'idle' ? 1 : 0) + DB.exercises.length);
   set('badge-period', DB.periods.length);
   set('badge-diary', DB.diaries.length);
   set('badge-study', DB.schedules.filter(s => matchesDay(s, todayStr()) && !isDone(s, todayStr())).length);
@@ -2724,10 +2835,12 @@ function applyTheme(key) {
   try { const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--brand').trim()); } catch(e) {}
 }
 function renderThemeChips() {
-  const box = document.getElementById('theme-chips');
-  if (!box) return;
-  box.innerHTML = THEMES.map(t => `<button class="ts-chip ${t.key === (DB.theme || 'sage') ? 'active' : ''}" data-theme="${t.key}"><span class="dot" style="background:${t.color}"></span>${t.name}</button>`).join('');
-  box.querySelectorAll('.ts-chip').forEach(b => b.addEventListener('click', () => applyTheme(b.dataset.theme)));
+  const boxes = [document.getElementById('theme-chips'), document.getElementById('avm-theme-chips')].filter(Boolean);
+  if (!boxes.length) return;
+  boxes.forEach(box => {
+    box.innerHTML = THEMES.map(t => `<button class="ts-chip ${t.key === (DB.theme || 'sage') ? 'active' : ''}" data-theme="${t.key}"><span class="dot" style="background:${t.color}"></span>${t.name}</button>`).join('');
+    box.querySelectorAll('.ts-chip').forEach(b => b.addEventListener('click', () => applyTheme(b.dataset.theme)));
+  });
 }
 
 /* ============ 图标上传 ============ */
@@ -2790,6 +2903,18 @@ document.getElementById('mod-file').addEventListener('change', e => {
   e.target.value = '';
 });
 
+/* ===== 点头像弹出菜单（换头像 / 换图标 / 换个风格）===== */
+function openAvatarMenu() { document.getElementById('avatar-menu').classList.add('show'); renderThemeChips(); }
+function closeAvatarMenu() { document.getElementById('avatar-menu').classList.remove('show'); }
+['home-logo', 'logo', 'landing-avatar'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', openAvatarMenu);
+});
+document.getElementById('avm-close').addEventListener('click', closeAvatarMenu);
+document.getElementById('avatar-menu').addEventListener('click', e => { if (e.target.id === 'avatar-menu') closeAvatarMenu(); });
+document.getElementById('avm-avatar').addEventListener('click', () => { closeAvatarMenu(); document.getElementById('icon-file').click(); });
+document.getElementById('avm-icons').addEventListener('click', () => { closeAvatarMenu(); openIconModal(); });
+
 /* ============ 初始化渲染 ============ */
 if (!DB.fastingTimer) DB.fastingTimer = { phase:'stopped', startTs:null, startTime:'', segments:[] };
 if (!DB.icon) DB.icon = '';
@@ -2819,6 +2944,23 @@ renderFasts();
 renderWeight();
 const fstart = document.getElementById('fast-start'); if (fstart) fstart.value = nowLocalStr();
 renderHome();
+/* 卡片 / 首页区块可折叠：点头标题展开或合上 */
+function makeCollapsible(card, headSel) {
+  const head = card.querySelector(headSel) || card.querySelector('.card-top') || card.querySelector('h2');
+  if (!head) return;
+  head.classList.add('card-head');
+  if (head.querySelector('.caret')) return;
+  const caret = document.createElement('span');
+  caret.className = 'caret'; caret.textContent = '▾';
+  head.appendChild(caret);
+  head.addEventListener('click', e => {
+    if (e.target.closest('button') || e.target.closest('input') || e.target.closest('.more')) return;
+    card.classList.toggle('collapsed');
+  });
+}
+document.querySelectorAll('.card').forEach(c => makeCollapsible(c));
+document.querySelectorAll('.home-block').forEach(c => makeCollapsible(c, '.home-block-head'));
+document.querySelectorAll('.home-anni').forEach(c => makeCollapsible(c, '.home-anni-head'));
 applyNavDogs();
 applySecIcons();
 renderWeather();
