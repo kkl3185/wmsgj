@@ -440,7 +440,7 @@
   }
 
   /* ===== 图标管理弹窗 ===== */
-  .icon-modal { position: fixed; inset: 0; background: rgba(20,18,30,.45); display: none; align-items: center; justify-content: center; z-index: 99; padding: 18px; }
+  .icon-modal { position: fixed; inset: 0; background: rgba(20,18,30,.45); display: none; align-items: center; justify-content: center; z-index: 400; padding: 18px; }
   .icon-modal.show { display: flex; }
   .icon-modal-box { background: var(--card); color: var(--ink); width: 100%; max-width: 440px; max-height: 86vh; overflow-y: auto; border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 18px 20px; }
   .im-head { display: flex; align-items: center; justify-content: space-between; font-size: 17px; font-weight: 800; margin-bottom: 12px; }
@@ -489,9 +489,9 @@
   /* ===== 进入页（头像 + 进入按钮）===== */
   .landing { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center;
     background: radial-gradient(140% 120% at 50% 0%, #CDEEDB 0%, #ABDEC9 58%, #8FCFB4 100%);
-    transition: opacity .45s ease; -webkit-font-smoothing: antialiased; overflow: hidden; }
+    transition: opacity .45s ease, visibility 0s .45s; -webkit-font-smoothing: antialiased; overflow: hidden; }
   .landing-dots { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
-  .landing.hide { opacity: 0; pointer-events: none; }
+  .landing.hide { opacity: 0; visibility: hidden; pointer-events: none; }
   .landing-card { position: relative; z-index: 1; text-align: center; color: #5B4A38; padding: 30px; animation: landIn .55s cubic-bezier(.2,.7,.3,1); }
   @keyframes landIn { from { opacity: 0; transform: translateY(16px) scale(.97); } to { opacity: 1; transform: none; } }
   .landing-avatar { width: 94px; height: 94px; border-radius: 30px; margin: 0 auto 18px; background: rgba(255,255,255,.72);
@@ -598,33 +598,7 @@
       <input type="file" id="icon-file" accept="image/*" style="display:none">
       <input type="file" id="mod-file" accept="image/*" style="display:none">
     </div>
-    <!-- 图标管理弹窗 -->
-    <div class="icon-modal" id="icon-modal">
-      <div class="icon-modal-box">
-        <div class="im-head"><span>🖼️ 自定义图标</span><button class="im-close" id="im-close">✕</button></div>
-        <div class="im-section">
-          <div class="im-label">App 图标（桌面 / 首页大图）</div>
-          <div class="im-app" id="im-app">点击上传</div>
-        </div>
-        <div class="im-section">
-          <div class="im-label">模块图标（首页 / 侧栏 / 导航，点哪个换哪个）</div>
-          <div class="im-grid" id="im-grid"></div>
-        </div>
-        <div class="im-tip">图片建议正方形，会自动压缩。换完后若已装到桌面，重新「添加到主屏幕」即可更新。</div>
-      </div>
-    </div>
-    <!-- 点头像弹出的小菜单：换头像 / 换图标 / 换个风格 -->
-    <div class="icon-modal" id="avatar-menu">
-      <div class="icon-modal-box avm-box">
-        <div class="im-head"><span>👤 头像与外观</span><button class="im-close" id="avm-close">✕</button></div>
-        <button class="avm-btn" id="avm-avatar">🖼️ 换头像（App 图标）</button>
-        <button class="avm-btn" id="avm-icons">🎨 换模块图标</button>
-        <div class="avm-theme">
-          <div class="avm-theme-label">🎨 换个风格</div>
-          <div class="ts-chips" id="avm-theme-chips"></div>
-        </div>
-      </div>
-    </div>
+    <!-- 图标/头像弹窗已移至侧栏之外（body 直接子元素），移动端侧栏隐藏时仍可正常显示 -->
     <div class="nav-item active" data-sec="home"><span class="emoji">🏠</span><span class="txt">首页</span></div>
     <div class="nav-item" data-sec="diet"><span class="emoji">🥗</span><span class="txt">减肥</span><span class="badge" id="badge-diet"></span></div>
     <div class="nav-item" data-sec="period"><span class="emoji">🌸</span><span class="txt">经期</span><span class="badge" id="badge-period"></span></div>
@@ -634,10 +608,37 @@
     <div class="nav-item" data-sec="money"><span class="emoji">💰</span><span class="txt">存钱</span><span class="badge" id="badge-money"></span></div>
     <div class="nav-item" data-sec="hobby"><span class="emoji">🎨</span><span class="txt">兴趣爱好</span><span class="badge" id="badge-hobby"></span></div>
     <div class="nav-item" data-sec="fortune"><span class="emoji">🔮</span><span class="txt">运势日历</span><span class="badge" id="badge-fortune"></span></div>
-    <div class="nav-item" data-sec="agenda"><span class="emoji">📝</span><span class="txt">事情表</span><span class="badge" id="badge-agenda"></span></div>
     <div class="nav-item" data-sec="calendar"><span class="emoji">📅</span><span class="txt">纪念日</span></div>
     <div class="foot">数据保存在本机浏览器<br>🧶 针织帽 · 你的生活小角落</div>
   </aside>
+
+  <!-- 弹窗：移出侧栏，移动端侧栏隐藏时仍可正常显示 -->
+  <div class="icon-modal" id="icon-modal">
+    <div class="icon-modal-box">
+      <div class="im-head"><span>🖼️ 自定义图标</span><button class="im-close" id="im-close">✕</button></div>
+      <div class="im-section">
+        <div class="im-label">App 图标（桌面 / 首页大图）</div>
+        <div class="im-app" id="im-app">点击上传</div>
+      </div>
+      <div class="im-section">
+        <div class="im-label">模块图标（首页 / 侧栏 / 导航，点哪个换哪个）</div>
+        <div class="im-grid" id="im-grid"></div>
+      </div>
+      <div class="im-tip">图片建议正方形，会自动压缩。换完后若已装到桌面，重新「添加到主屏幕」即可更新。</div>
+    </div>
+  </div>
+  <!-- 点头像弹出的小菜单：换头像 / 换图标 / 换个风格 -->
+  <div class="icon-modal" id="avatar-menu">
+    <div class="icon-modal-box avm-box">
+      <div class="im-head"><span>👤 头像与外观</span><button class="im-close" id="avm-close">✕</button></div>
+      <button class="avm-btn" id="avm-avatar">🖼️ 换头像（App 图标）</button>
+      <button class="avm-btn" id="avm-icons">🎨 换模块图标</button>
+      <div class="avm-theme">
+        <div class="avm-theme-label">🎨 换个风格</div>
+        <div class="ts-chips" id="avm-theme-chips"></div>
+      </div>
+    </div>
+  </div>
 
   <nav class="bottom-nav">
     <button data-sec="home"><span>🏠</span>首页</button>
@@ -649,7 +650,6 @@
     <button data-sec="money"><span>💰</span>存钱</button>
     <button data-sec="hobby"><span>🎨</span>爱好</button>
     <button data-sec="fortune"><span>🔮</span>运势</button>
-    <button data-sec="agenda"><span>📝</span>事情表</button>
     <button data-sec="calendar"><span>📅</span>纪念日</button>
   </nav>
 
@@ -2641,7 +2641,7 @@ function fileToDataUrl(file, maxW) {
 
 /* ============ 角标 ============ */
 function updateBadges() {
-  const set = (id, n) => { const b = document.getElementById(id); if (n > 0) { b.textContent = n; b.classList.add('show'); } else b.classList.remove('show'); };
+  const set = (id, n) => { const b = document.getElementById(id); if (!b) return; if (n > 0) { b.textContent = n; b.classList.add('show'); } else b.classList.remove('show'); };
   set('badge-diet', DB.meals.breakfast.length + DB.meals.lunch.length + DB.meals.dinner.length + DB.meals.snack.length + DB.drinks.length + (DB.fastPhase && DB.fastPhase !== 'idle' ? 1 : 0) + DB.exercises.length);
   set('badge-period', DB.periods.length);
   set('badge-diary', DB.diaries.length);
