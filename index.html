@@ -172,6 +172,20 @@
 
   .empty { color: var(--muted); font-size: 14px; text-align: center; padding: 26px 0; }
 
+  /* ===== 列表折叠区（条目多时可收起）===== */
+  .list-fold-wrap { margin-top: 10px; border: 1px solid var(--line); border-radius: 13px; overflow: hidden; background: var(--tint); }
+  .list-fold-head { display: flex; align-items: center; gap: 8px; padding: 11px 14px; cursor: pointer; user-select: none; font-size: 14px; font-weight: 700; color: var(--ink); background: var(--brand-soft); transition: .15s; }
+  .list-fold-head:hover { background: var(--brand-soft); filter: brightness(.97); }
+  .list-fold-head .caret { margin-left: auto; font-size: 13px; color: var(--muted); transition: transform .2s; }
+  .list-fold-head .fold-count { font-size: 12px; font-weight: 600; color: #fff; background: var(--brand); border-radius: 20px; padding: 1px 9px; }
+  .list-fold-body { padding: 10px; transition: .2s; }
+  .list-fold-wrap.folded .list-fold-body { display: none; }
+  .list-fold-wrap.folded .list-fold-head .caret { transform: rotate(-90deg); }
+  .list-fold-wrap .list { gap: 8px; }
+  .list-fold-wrap.empty-list .list-fold-head { cursor: default; opacity: .6; }
+  .list-fold-wrap.empty-list .list-fold-head .caret { display: none; }
+  .list-fold-wrap.empty-list .fold-count { display: none; }
+
   .shop-item-wrap { border: 1px solid var(--line); border-radius: 13px; overflow: hidden; background: var(--tint); }
   .shop-item-wrap.done { opacity: .65; }
   .shop-item { border: none; border-radius: 0; background: transparent; gap: 12px; }
@@ -208,6 +222,29 @@
   .week-task.done { text-decoration: line-through; color: var(--muted); opacity: .65; border-left-color: var(--green); }
   .week-task .t { color: var(--brand); font-weight: 700; }
   .week-task.done .t { color: var(--green); }
+
+  /* ===== 计划：列式时间轴（一天一列，最左列时间）===== */
+  .plan-timeline { display: flex; overflow-x: auto; gap: 0; border: 1px solid var(--line); border-radius: 13px; background: var(--tint); min-height: 420px; scrollbar-width: thin; }
+  .plan-timeline::-webkit-scrollbar { height: 8px; }
+  .plan-timeline::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+  .plan-col-time { flex: 0 0 64px; background: var(--brand-soft); border-right: 2px solid var(--line); display: flex; flex-direction: column; }
+  .plan-col-day { flex: 1 0 130px; min-width: 130px; border-right: 1px solid var(--line); display: flex; flex-direction: column; }
+  .plan-col-day:last-child { border-right: none; }
+  .plan-col-day.today { background: var(--brand-soft); }
+  .plan-day-head { padding: 8px 6px; text-align: center; font-size: 12px; font-weight: 800; border-bottom: 1px solid var(--line); background: var(--card); position: sticky; top: 0; z-index: 2; }
+  .plan-col-day.today .plan-day-head { background: var(--brand-soft); color: var(--brand); }
+  .plan-day-head .wd { font-size: 11px; color: var(--muted); }
+  .plan-col-day.today .plan-day-head .wd { color: var(--brand); }
+  .plan-day-head .dt { font-size: 13px; }
+  .plan-day-head .today-tag { font-size: 10px; color: var(--brand); display: block; }
+  .plan-time-label { flex: 1 0 48px; min-height: 48px; padding: 3px 4px; text-align: right; font-size: 11px; color: var(--muted); border-bottom: 1px dashed var(--line); border-top: 1px solid transparent; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .plan-slot { flex: 1 0 48px; min-height: 48px; border-bottom: 1px dashed var(--line); border-top: 1px solid transparent; padding: 2px; position: relative; }
+  .plan-slot:last-child, .plan-time-label:last-child { border-bottom: none; }
+  .plan-task { font-size: 11px; padding: 4px 6px; background: #fff; border: 1px solid var(--line); border-left: 3px solid var(--brand); border-radius: 8px; line-height: 1.35; word-break: break-all; margin-bottom: 2px; }
+  .plan-task.done { text-decoration: line-through; color: var(--muted); opacity: .65; border-left-color: var(--green); }
+  .plan-task .t { color: var(--brand); font-weight: 700; display: block; font-size: 10px; }
+  .plan-task.done .t { color: var(--green); }
+  @media (max-width: 980px) { .plan-timeline { min-height: 360px; } }
 
   /* ===== 手机底部导航 ===== */
   .bottom-nav { display: none; }
@@ -691,7 +728,10 @@
       </div>
       <div class="home-block">
         <div class="home-block-head"><span>📝 事情表</span><button class="btn-primary btn-sm" id="home-agenda-add">＋ 添加</button></div>
-        <div class="list" id="home-agenda-list"></div>
+        <div class="list-fold-wrap" id="home-agenda-fold-wrap">
+          <div class="list-fold-head" id="home-agenda-fold-head"><span>📋 待办事情</span><span class="fold-count" id="home-agenda-count">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body"><div class="list" id="home-agenda-list"></div></div>
+        </div>
       </div>
       <div class="home-anni" id="home-anni"></div>
     </section>
@@ -727,7 +767,10 @@
           <div class="field"><label>进食开始时间（点停止时记录）</label><input type="datetime-local" id="fast-end"></div>
         </div>
 
-        <div class="list" id="fast-log" style="margin-top:10px"></div>
+        <div class="list-fold-wrap" id="fast-fold-wrap">
+          <div class="list-fold-head" id="fast-fold-head"><span>📋 历史断食记录</span><span class="fold-count" id="fast-count">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body"><div class="list" id="fast-log" style="margin-top:0"></div></div>
+        </div>
       </div>
 
       <div class="card">
@@ -758,7 +801,10 @@
           <div id="w-chart-svg"></div>
           <div class="hint">每次「记录今日体重」会在当天存一条数据；同一天重复记录会覆盖。</div>
         </div>
-        <div class="list" id="w-list" style="margin-top:10px"></div>
+        <div class="list-fold-wrap" id="w-fold-wrap">
+          <div class="list-fold-head" id="w-fold-head"><span>📋 体重记录</span><span class="fold-count" id="w-count">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body"><div class="list" id="w-list" style="margin-top:0"></div></div>
+        </div>
       </div>
 
       <div class="card">
@@ -786,7 +832,10 @@
           <span class="stat"><span class="num" id="meal-count">0</span><span class="lbl">本日餐次</span></span>
           <span class="stat amber"><span class="num" id="day-kcal-all">0</span><span class="lbl">本日总热量（含饮品）</span></span>
         </div>
-        <div class="list" id="meal-list"></div>
+        <div class="list-fold-wrap" id="meal-fold-wrap">
+          <div class="list-fold-head" id="meal-fold-head"><span>📋 三餐记录</span><span class="fold-count" id="meal-count-fold">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body"><div class="list" id="meal-list"></div></div>
+        </div>
       </div>
 
       <div class="card">
@@ -808,7 +857,10 @@
           <span class="stat"><span class="num" id="drink-cost">0</span><span class="lbl">饮品花费 ¥</span></span>
           <span class="stat"><span class="num" id="drink-kcal-total">0</span><span class="lbl">饮品热量 kcal</span></span>
         </div>
-        <div class="list" id="drink-list"></div>
+        <div class="list-fold-wrap" id="drink-fold-wrap">
+          <div class="list-fold-head" id="drink-fold-head"><span>📋 饮品记录</span><span class="fold-count" id="drink-count-fold">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body"><div class="list" id="drink-list"></div></div>
+        </div>
       </div>
 
       <div class="card">
@@ -828,7 +880,10 @@
           <span class="stat"><span class="num" id="ex-total-kcal">0</span><span class="lbl">消耗 kcal</span></span>
           <span class="stat"><span class="num" id="ex-count">0</span><span class="lbl">运动次数</span></span>
         </div>
-        <div class="list" id="ex-list"></div>
+        <div class="list-fold-wrap" id="ex-fold-wrap">
+          <div class="list-fold-head" id="ex-fold-head"><span>📋 运动记录</span><span class="fold-count" id="ex-count-fold">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body"><div class="list" id="ex-list"></div></div>
+        </div>
       </div>
     </section>
 
@@ -877,7 +932,12 @@
           <button class="btn-ghost" id="diary-reset">清空</button>
         </div>
       </div>
-      <div class="card"><h2>📚 日记本</h2><div class="list" id="diary-list"></div></div>
+      <div class="card"><h2>📚 日记本</h2>
+        <div class="list-fold-wrap" id="diary-fold-wrap">
+          <div class="list-fold-head" id="diary-fold-head"><span>📋 日记列表</span><span class="fold-count" id="diary-count">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body"><div class="list" id="diary-list"></div></div>
+        </div>
+      </div>
     </section>
 
     <!-- ===== 学习 ===== -->
@@ -907,7 +967,10 @@
           </div>
         </div>
         <div class="progress" style="margin-top:16px"><i id="study-bar"></i></div>
-        <div class="list" id="study-list"></div>
+        <div class="list-fold-wrap" id="study-fold-wrap">
+          <div class="list-fold-head" id="study-fold-head"><span>📋 当天任务</span><span class="fold-count" id="study-count">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body"><div class="list" id="study-list"></div></div>
+        </div>
       </div>
 
       <div class="card">
@@ -938,7 +1001,10 @@
           </div>
         </div>
         <div class="hint">不填退役日期 = 还在用，显示"已陪伴多少天"；填了 = 已坏 / 已丢，按"退役 − 购买"算实际寿命，帮你对比哪件更耐用。</div>
-        <div class="list" id="pc-list"></div>
+        <div class="list-fold-wrap" id="pc-fold-wrap">
+          <div class="list-fold-head" id="pc-fold-head"><span>📋 物品寿命记录</span><span class="fold-count" id="pc-count">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body"><div class="list" id="pc-list"></div></div>
+        </div>
       </div>
 
       <div class="card">
@@ -963,7 +1029,10 @@
           <span class="stat"><span class="num" id="shop-bought">0</span><span class="lbl">已购买件数</span></span>
         </div>
         <div class="progress"><i id="shop-progress-bar"></i></div>
-        <div class="list" id="shop-list"></div>
+        <div class="list-fold-wrap" id="shop-fold-wrap">
+          <div class="list-fold-head" id="shop-fold-head"><span>📋 购物清单</span><span class="fold-count" id="shop-count">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body"><div class="list" id="shop-list"></div></div>
+        </div>
       </div>
     </section>
 
@@ -972,13 +1041,29 @@
       <div class="sec-head"><h1><span class="sec-icon" data-sec-icon="money"></span>存钱记账</h1><p>记「每月生活费」与「当月总花销」，再算上额外入账，自动得出你每月存下多少</p></div>
 
       <div class="card">
-        <h2>⚙️ 基本设定</h2>
+        <h2>⚙️ 基本设定 <span class="tag">生活费 · 额外入账</span></h2>
         <div class="row">
           <div class="field" style="max-width:340px"><label>每月生活费 (¥)</label>
             <div class="input-with-btn"><input type="number" id="sv-allowance" min="0" step="0.01"><button class="btn-primary btn-sm" id="sv-save-set">保存设定</button></div>
           </div>
         </div>
         <div class="hint">就是你的固定生活费 / 月花销基数，用来算「存下多少」。</div>
+
+        <div class="sv-divider" style="border-top:1px dashed var(--line);margin:18px 0 14px;padding-top:6px"></div>
+
+        <h2>💸 额外的入账 <span class="tag">生活费之外的额外收入</span></h2>
+        <div class="row">
+          <div class="field" style="max-width:170px;min-width:0"><label>日期</label><input type="date" id="sv-extra-date"></div>
+          <div class="field" style="max-width:150px;min-width:0"><label>金额 (¥)</label><input type="number" id="sv-extra-amt" min="0" step="0.01"></div>
+          <div class="field"><label>备注</label>
+            <div class="input-with-btn"><input type="text" id="sv-extra-note" placeholder="如：兼职 / 红包 / 退款"><button class="btn-primary" id="sv-extra-add">添加</button><button class="btn-ghost btn-sm" id="sv-extra-cancel" style="display:none">取消</button></div>
+          </div>
+        </div>
+        <div class="hint">额外收入会自动并入每月结余。</div>
+        <div class="list-fold-wrap" id="sv-extra-fold-wrap">
+          <div class="list-fold-head" id="sv-extra-fold-head"><span>📋 额外入账记录</span><span class="fold-count" id="sv-extra-count">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body" id="sv-extra-fold-body"><div class="list" id="sv-extra-list"></div></div>
+        </div>
       </div>
 
       <div class="card">
@@ -995,20 +1080,10 @@
           <span class="stat green"><span class="num" id="sv-saved">0</span><span class="lbl">选中月存下 ¥</span></span>
           <span class="stat amber"><span class="num" id="sv-extra-total">0</span><span class="lbl">额外入账合计 ¥</span></span>
         </div>
-        <div class="list" id="sv-list"></div>
-      </div>
-
-      <div class="card">
-        <h2>💸 额外的入账</h2>
-        <div class="row">
-          <div class="field" style="max-width:170px;min-width:0"><label>日期</label><input type="date" id="sv-extra-date"></div>
-          <div class="field" style="max-width:150px;min-width:0"><label>金额 (¥)</label><input type="number" id="sv-extra-amt" min="0" step="0.01"></div>
-          <div class="field"><label>备注</label>
-            <div class="input-with-btn"><input type="text" id="sv-extra-note" placeholder="如：兼职 / 红包 / 退款"><button class="btn-primary" id="sv-extra-add">添加</button><button class="btn-ghost btn-sm" id="sv-extra-cancel" style="display:none">取消</button></div>
-          </div>
+        <div class="list-fold-wrap" id="sv-list-fold-wrap">
+          <div class="list-fold-head" id="sv-list-fold-head"><span>📋 月度花销记录</span><span class="fold-count" id="sv-month-count">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body" id="sv-list-fold-body"><div class="list" id="sv-list"></div></div>
         </div>
-        <div class="hint">记录生活费之外的额外收入，会自动并入每月结余。</div>
-        <div class="list" id="sv-extra-list"></div>
       </div>
     </section>
 
@@ -1048,7 +1123,10 @@
           <span class="stat"><span class="num" id="hb-total-hours">0</span><span class="lbl">总时长(时)</span></span>
           <span class="stat"><span class="num" id="hb-count">0</span><span class="lbl">作品数</span></span>
         </div>
-        <div class="list" id="hb-list"></div>
+        <div class="list-fold-wrap" id="hb-fold-wrap">
+          <div class="list-fold-head" id="hb-fold-head"><span>📋 作品记录</span><span class="fold-count" id="hb-count">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body"><div class="list" id="hb-list"></div></div>
+        </div>
       </div>
     </section>
 
@@ -1099,7 +1177,10 @@
           <h2>📋 待办事情</h2>
           <button class="btn-primary btn-sm" id="agenda-add">＋ 添加</button>
         </div>
-        <div class="list" id="agenda-list"></div>
+        <div class="list-fold-wrap" id="agenda-fold-wrap">
+          <div class="list-fold-head" id="agenda-fold-head"><span>📋 事情列表</span><span class="fold-count" id="agenda-count">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body"><div class="list" id="agenda-list"></div></div>
+        </div>
       </div>
     </section>
 
@@ -1120,7 +1201,10 @@
       </div>
       <div class="card">
         <div class="card-top"><h2>🎉 我的纪念日</h2></div>
-        <div class="list" id="anni-list"></div>
+        <div class="list-fold-wrap" id="anni-fold-wrap">
+          <div class="list-fold-head" id="anni-fold-head"><span>📋 纪念日列表</span><span class="fold-count" id="anni-count">0</span><span class="caret">▾</span></div>
+          <div class="list-fold-body"><div class="list" id="anni-list"></div></div>
+        </div>
       </div>
     </section>
 
@@ -1139,12 +1223,19 @@
     </div>
   </div>
 
-  <!-- ===== 弹窗：添加纪念日 ===== -->
+  <!-- ===== 弹窗：添加/修改纪念日 ===== -->
   <div class="icon-modal" id="anni-modal">
     <div class="icon-modal-box">
-      <h3>添加纪念日</h3>
+      <h3 id="anni-modal-title">添加纪念日</h3>
       <div class="field"><label>名称</label><input type="text" id="anni-name" placeholder="例如：妈妈生日 / 恋爱纪念日"></div>
-      <div class="field"><label>日期（每年这天）</label><input type="date" id="anni-date"></div>
+      <div class="field"><label>日期</label><input type="date" id="anni-date"></div>
+      <div class="field"><label>类型</label>
+        <div class="row" style="gap:8px;margin-bottom:0">
+          <button type="button" class="rchip active" id="anni-type-year" data-at="year">📅 每年都过</button>
+          <button type="button" class="rchip" id="anni-type-since" data-at="since">📅 距今多少天</button>
+        </div>
+        <div class="hint" id="anni-type-hint">每年这一天都会提醒还有几天 / 今天就是。</div>
+      </div>
       <div class="field"><label>照片（可选）</label><input type="file" id="anni-photo" accept="image/*"></div>
       <div class="modal-actions">
         <button class="btn-ghost" id="anni-cancel">取消</button>
@@ -1251,6 +1342,17 @@ function fmtHm(mins) {
   return h + ' 时 ' + String(m).padStart(2, '0') + ' 分';
 }
 function fastDateOf(dtStr) { return dtStr ? dtStr.slice(0, 10) : ''; }
+// 七天一覆盖：只保留最近7天的断食记录
+function trimFasts7() {
+  if (!DB.fasts || !DB.fasts.length) return;
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 7);
+  const cutoffStr = todayStr(cutoff); // 7天前（含）的 YYYY-MM-DD
+  DB.fasts = DB.fasts.filter(f => {
+    const ds = f.date || fastDateOf(f.start || '');
+    return !ds || ds >= cutoffStr;
+  });
+}
 let fastEditingId = null;
 function fastToggle() {
   // 编辑模式：保存对已有记录的修改
@@ -1291,6 +1393,7 @@ function fastToggle() {
     const fastMs = eat - st, eatMs = (new Date(endV)) - eat;
     if (fastMs <= 0) { alert('进食开始时间须晚于禁食开始时间，请调整时间'); return; }
     DB.fasts.push({ id: uid(), start: DB.fastStart, eatStart: DB.fastEatStart, end: endV, fastMins: Math.round(fastMs / 60000), eatMins: Math.round(eatMs / 60000), date: todayStr(st) });
+    trimFasts7();
     DB.fastActive = false; DB.fastPhase = 'idle'; DB.fastStart = ''; DB.fastEatStart = '';
     startEl.value = ''; endEl.value = '';
   }
@@ -1341,6 +1444,7 @@ function renderFasts() {
   fastTick();
   const log = document.getElementById('fast-log');
   if (!log) return;
+  updateFoldCount('fast-fold-wrap', 'fast-count', DB.fasts.length);
   if (!DB.fasts.length) { log.innerHTML = '<div class="empty">还没有断食记录，点「开始禁食」即可</div>'; return; }
   log.innerHTML = DB.fasts.slice().reverse().map(f => `
     <div class="item">
@@ -1395,6 +1499,7 @@ function renderWeight() {
   const btn = document.getElementById('w-record'); if (btn) btn.textContent = (view === todayStr()) ? '记录今日体重' : '记录该日体重';
   const list = document.getElementById('w-list');
   if (!list) return;
+  updateFoldCount('w-fold-wrap', 'w-count', w.records.length);
   if (!w.records.length) { list.innerHTML = '<div class="empty">还没有体重记录，拖动滑块后点「记录体重」</div>'; }
   else {
     list.innerHTML = w.records.slice().sort((a, b) => b.date.localeCompare(a.date)).map(r => `<div class="item"><div class="info"><div class="title">⚖️ ${num(r.value).toFixed(1)} kg</div><div class="meta">${r.date}</div></div><div class="acts"><button class="btn-ghost btn-sm" data-wedit="${r.date}">修改</button><button class="btn-danger btn-sm" data-wdel="${r.date}">✕</button></div></div>`).join('');
@@ -1557,6 +1662,7 @@ function renderMeals() {
   document.getElementById('meal-kcal-total').textContent = Math.round(mealKcal);
   document.getElementById('meal-count').textContent = all.length;
   document.getElementById('day-kcal-all').textContent = Math.round(mealKcal + drinkKcal);
+  updateFoldCount('meal-fold-wrap', 'meal-count-fold', all.length);
   if (!all.length) { list.innerHTML = '<div class="empty">这一天还没有三餐记录，添加第一笔吧～</div>'; return; }
   const CAT = { breakfast: '🌅 早餐', lunch: '☀️ 午餐', dinner: '🌙 晚餐', snack: '🍪 加餐' };
   list.innerHTML = all.map(m => `
@@ -1643,6 +1749,7 @@ function renderDrinks() {
   document.getElementById('drink-count').textContent = count;
   document.getElementById('drink-cost').textContent = cost.toFixed(2);
   document.getElementById('drink-kcal-total').textContent = Math.round(kcal);
+  updateFoldCount('drink-fold-wrap', 'drink-count-fold', count);
   if (!count) { list.innerHTML = '<div class="empty">这一天还没喝东西～</div>'; return; }
   list.innerHTML = day.map(d => `
     <div class="item">
@@ -1716,6 +1823,7 @@ function renderExercises() {
   document.getElementById('ex-total-min').textContent = Math.round(totalMin);
   document.getElementById('ex-total-kcal').textContent = Math.round(totalKcal);
   document.getElementById('ex-count').textContent = view.length;
+  updateFoldCount('ex-fold-wrap', 'ex-count-fold', view.length);
   if (!DB.exercises.length) { list.innerHTML = '<div class="empty">还没有运动记录，动起来吧 💪</div>'; return; }
   list.innerHTML = view.map(e => `
     <div class="item">
@@ -1857,6 +1965,7 @@ function loadDiary(d) {
 }
 function renderDiaries() {
   const list = document.getElementById('diary-list');
+  updateFoldCount('diary-fold-wrap', 'diary-count', DB.diaries.length);
   if (!DB.diaries.length) { list.innerHTML = '<div class="empty">还没有日记</div>'; return; }
   list.innerHTML = DB.diaries.map(d => {
     const mood = MOODS.find(m => m[0] === d.mood), weather = WEATHERS.find(w => w[0] === d.weather);
@@ -1952,6 +2061,7 @@ function renderStudy() {
   const list = document.getElementById('study-list');
   const items = DB.schedules.filter(s => matchesDay(s, studyDate)).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
   const done = items.filter(s => isDone(s, studyDate)).length;
+  updateFoldCount('study-fold-wrap', 'study-count', items.length);
   document.getElementById('study-bar').style.width = items.length ? (done / items.length * 100) + '%' : '0';
   if (!items.length) { list.innerHTML = '<div class="empty">这一天还没有安排，加个任务吧</div>'; return; }
   list.innerHTML = items.map(s => {
@@ -1985,20 +2095,55 @@ function renderWeek() {
   const start = mondayOf(new Date()); start.setDate(start.getDate() + weekOffset * 7);
   const wd = ['周一','周二','周三','周四','周五','周六','周日'];
   const today = todayStr();
-  let cells = '';
+  // 时间轴：0:00 ~ 24:00，每2小时一格，共12行
+  const hours = [];
+  for (let h = 0; h < 24; h += 2) hours.push(h);
+  // 收集本周7天每天的任务
+  const days = [];
   for (let i = 0; i < 7; i++) {
     const d = new Date(start); d.setDate(start.getDate() + i);
     const ds = fmtDate(d);
     const tasks = DB.schedules.filter(s => matchesDay(s, ds)).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
-    const isToday = ds === today;
-    const tasksHtml = tasks.length
-      ? tasks.map(t => `<div class="week-task ${isDone(t, ds) ? 'done' : ''}">${t.time ? `<span class="t">${t.time}</span> ` : ''}${escapeHtml(t.text)}${(t.repeatDays && t.repeatDays.length) ? ' 🔁' : ''}</div>`).join('')
-      : '<div style="color:#bbb;font-size:11px;padding:4px 0">—</div>';
-    cells += `<div class="week-cell ${isToday ? 'today' : ''}">
-      <div class="wd ${isToday ? 't' : ''}">${wd[i]}${isToday ? ' · 今天' : ''}</div>
-      <div class="dt">${d.getMonth()+1}/${d.getDate()}</div>${tasksHtml}</div>`;
+    days.push({ ds, d, tasks, isToday: ds === today, wd: wd[i] });
   }
-  document.getElementById('week-grid').innerHTML = cells;
+  // 时间列
+  let html = '<div class="plan-timeline">';
+  html += '<div class="plan-col-time">';
+  html += '<div class="plan-day-head" style="color:var(--brand)">⏰ 时间</div>';
+  hours.forEach(h => {
+    const label = String(h).padStart(2, '0') + ':00';
+    html += `<div class="plan-time-label">${label}</div>`;
+  });
+  html += '</div>';
+  // 7天列
+  days.forEach(day => {
+    html += `<div class="plan-col-day ${day.isToday ? 'today' : ''}">`;
+    html += `<div class="plan-day-head"><span class="wd">${day.wd}</span><br><span class="dt">${day.d.getMonth()+1}/${day.d.getDate()}</span>${day.isToday ? '<span class="today-tag">今天</span>' : ''}</div>`;
+    hours.forEach(h => {
+      // 该时间段（h:00 ~ h+2:00）的任务
+      const slotTasks = day.tasks.filter(t => {
+        if (!t.time) return false;
+        const th = parseInt(t.time.slice(0, 2), 10);
+        return th >= h && th < h + 2;
+      });
+      // 无时间任务放在第一个时间段
+      const noTimeTasks = (h === 0) ? day.tasks.filter(t => !t.time) : [];
+      const allTasks = slotTasks.concat(noTimeTasks);
+      let inner = '';
+      if (allTasks.length) {
+        inner = allTasks.map(t => {
+          const done = isDone(t, day.ds);
+          const rep = (t.repeatDays && t.repeatDays.length) ? ' 🔁' : '';
+          return `<div class="plan-task ${done ? 'done' : ''}">${t.time ? `<span class="t">${t.time}</span>` : ''}${escapeHtml(t.text)}${rep}</div>`;
+        }).join('');
+      }
+      html += `<div class="plan-slot">${inner}</div>`;
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  const grid = document.getElementById('week-grid');
+  if (grid) grid.innerHTML = html;
   const end = new Date(start); end.setDate(start.getDate() + 6);
   document.getElementById('week-range').textContent = `${start.getMonth()+1}月${start.getDate()}日 - ${end.getMonth()+1}月${end.getDate()}日`;
 }
@@ -2071,6 +2216,7 @@ function renderShop() {
   const list = document.getElementById('shop-list');
   const total = DB.shopping.length;
   updateShopStats();
+  updateFoldCount('shop-fold-wrap', 'shop-count', total);
   if (!total) { list.innerHTML = '<div class="empty">清单是空的，添加要买的东西吧</div>'; return; }
   list.innerHTML = DB.shopping.map(s => `
     <div class="shop-item-wrap ${s.done ? 'done' : ''}">
@@ -2135,6 +2281,7 @@ function addPurchase() {
 function daysBetween(a, b) { return Math.round((new Date(b) - new Date(a)) / 86400000); }
 function renderPurchases() {
   const list = document.getElementById('pc-list');
+  updateFoldCount('pc-fold-wrap', 'pc-count', DB.purchases.length);
   if (!DB.purchases.length) { list.innerHTML = '<div class="empty">还没有记录，记下第一件想追踪寿命的东西吧～</div>'; return; }
   const today = todayStr();
   const sorted = [...DB.purchases].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
@@ -2225,6 +2372,7 @@ function renderSavings() {
   document.getElementById('sv-total-spend').textContent = totalSpend.toFixed(2);
   document.getElementById('sv-saved').textContent = sel ? (allowance - sel.amount).toFixed(2) : '—';
   document.getElementById('sv-extra-total').textContent = extraTotal.toFixed(2);
+  updateFoldCount('sv-list-fold-wrap', 'sv-month-count', months.length);
   if (!months.length) { list.innerHTML = '<div class="empty">还没有任何月份的花销记录</div>'; }
   else {
     list.innerHTML = months.slice().sort((a, b) => b.month.localeCompare(a.month)).map(m => {
@@ -2243,6 +2391,7 @@ function renderSavings() {
     }));
   }
   const elist = document.getElementById('sv-extra-list');
+  updateFoldCount('sv-extra-fold-wrap', 'sv-extra-count', DB.savings.extra.length);
   if (!DB.savings.extra.length) { elist.innerHTML = '<div class="empty">还没有额外入账记录</div>'; }
   else {
     elist.innerHTML = DB.savings.extra.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).map(e => `<div class="item">
@@ -2372,6 +2521,7 @@ function renderHobbies() {
   document.getElementById('hb-total-cost').textContent = totalCost.toFixed(2);
   document.getElementById('hb-total-hours').textContent = totalHours.toFixed(1);
   document.getElementById('hb-count').textContent = recs.length;
+  updateFoldCount('hb-fold-wrap', 'hb-count', recs.length);
   if (!recs.length) { list.innerHTML = '<div class="empty">这个爱好还没有作品，添加第一件吧 🎉</div>'; return; }
   list.innerHTML = recs.map(r => `
     <div class="item">
@@ -2480,6 +2630,7 @@ document.getElementById('fortune-date').addEventListener('change', renderFortune
 function renderAgenda() {
   const list = document.getElementById('agenda-list'); if (!list) return;
   const items = (DB.agenda || []).slice().sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  updateFoldCount('agenda-fold-wrap', 'agenda-count', items.length);
   if (!items.length) { list.innerHTML = '<div class="empty">还没有待办，点「＋ 添加」记一件</div>'; return; }
   list.innerHTML = items.map(it => `
     <div class="item ${it.done ? 'done' : ''}">
@@ -2517,8 +2668,33 @@ function addAgenda() {
 
 /* ============ 纪念日日历 ============ */
 let anniCalView = (function () { const n = new Date(); return { y: n.getFullYear(), m: n.getMonth() }; })();
-function anniCountdown(mmdd) {
-  const [m, d] = mmdd.split('-').map(Number);
+function anniCountdown(a) {
+  // a.date: 'MM-DD'；a.type: 'year'(每年都过) | 'since'(从那时到现在已多少天) | undefined(兼容旧数据按year处理)
+  const t = a.type || 'year';
+  if (t === 'since') {
+    // 从那个日期到现在已经过了多少天（完整日期从 a.fullDate 取，兼容旧数据无 fullDate 时用今年+a.date）
+    const fullDate = a.fullDate || '';
+    let base;
+    if (fullDate) {
+      // fullDate 格式 YYYY-MM-DD
+      const [yy, mm, dd] = fullDate.split('-').map(Number);
+      base = new Date(yy, mm - 1, dd);
+    } else {
+      // 旧数据无完整日期：用今年+MM-DD 近似（用户可修改补全）
+      const [mm, dd] = (a.date || '').split('-').map(Number);
+      const nowY = new Date().getFullYear();
+      base = new Date(nowY, (mm || 1) - 1, dd || 1);
+    }
+    const now = new Date(); now.setHours(0, 0, 0, 0);
+    base.setHours(0, 0, 0, 0);
+    if (isNaN(base.getTime())) return { cls: 'past', text: '日期有误' };
+    const days = Math.round((now - base) / 86400000);
+    if (days === 0) return { cls: 'today', text: '今天 🎉' };
+    if (days > 0) return { cls: 'past', text: '已过 ' + days + ' 天' };
+    return { cls: 'future', text: '还有 ' + Math.abs(days) + ' 天' };
+  }
+  // year: 每年都过
+  const [m, d] = (a.date || '').split('-').map(Number);
   const now = new Date(); now.setHours(0, 0, 0, 0);
   const y = now.getFullYear();
   const thisYear = new Date(y, m - 1, d);
@@ -2555,31 +2731,71 @@ function renderCalendar() {
   }));
   const list = document.getElementById('anni-list');
   const arr = (DB.anniversaries || []).slice().sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  updateFoldCount('anni-fold-wrap', 'anni-count', arr.length);
   if (!arr.length) { list.innerHTML = '<div class="empty">还没有纪念日，点「＋ 加纪念日」添加一个</div>'; return; }
   list.innerHTML = arr.map(a => {
-    const cd = anniCountdown(a.date);
+    const cd = anniCountdown(a);
     const ph = a.photo ? `<div class="anni-thumb" style="background-image:url('${escapeAttr(a.photo)}')"></div>` : `<div class="anni-thumb anni-thumb-empty">📷</div>`;
+    const typeLabel = (a.type || 'year') === 'since' ? '距今' : '每年';
+    const dateLabel = (a.type === 'since' && a.fullDate) ? a.fullDate : (a.date || '').replace('-', '月') + (a.type === 'since' ? '' : '日');
     return `<div class="item">
       ${ph}
-      <div class="info"><div class="title">${escapeHtml(a.name)}</div><div class="meta">每年 ${a.date.replace('-', '月')}日</div></div>
+      <div class="info"><div class="title">${escapeHtml(a.name)} <span class="cat-tag">${typeLabel}</span></div><div class="meta">${(a.type === 'since') ? '📅 ' + dateLabel : '每年 ' + dateLabel + (a.type === 'since' ? '' : '日')}</div></div>
       <span class="cd-pill ${cd.cls}">${cd.text}</span>
-      <label class="show-toggle"><input type="checkbox" data-ashow="${a.id}" ${a.showHome ? 'checked' : ''}>首页</label>
-      <button class="btn-danger btn-sm" data-adel="${a.id}">✕</button>
+      <div class="acts">
+        <label class="show-toggle"><input type="checkbox" data-ashow="${a.id}" ${a.showHome ? 'checked' : ''}>首页</label>
+        <button class="btn-ghost btn-sm" data-aedit="${a.id}">修改</button>
+        <button class="btn-danger btn-sm" data-adel="${a.id}">✕</button>
+      </div>
     </div>`;
   }).join('');
   list.querySelectorAll('[data-ashow]').forEach(c => c.addEventListener('change', () => {
     const a = DB.anniversaries.find(x => x.id === c.dataset.ashow); if (a) { a.showHome = c.checked; save(); renderCalendar(); renderHomeAnniversaries(); }
   }));
+  list.querySelectorAll('[data-aedit]').forEach(b => b.addEventListener('click', () => editAnni(b.dataset.aedit)));
   list.querySelectorAll('[data-adel]').forEach(b => b.addEventListener('click', () => {
     if (!confirm('删除这个纪念日？')) return;
     DB.anniversaries = DB.anniversaries.filter(x => x.id !== b.dataset.adel); save(); renderCalendar(); renderHomeAnniversaries(); updateBadges();
   }));
 }
+let anniEditingId = null;
+let anniTypeSel = 'year';
+function setAnniType(t) {
+  anniTypeSel = t;
+  document.getElementById('anni-type-year').classList.toggle('active', t === 'year');
+  document.getElementById('anni-type-since').classList.toggle('active', t === 'since');
+  const hint = document.getElementById('anni-type-hint');
+  if (hint) hint.textContent = t === 'year' ? '每年这一天都会提醒还有几天 / 今天就是。' : '从这一天到现在已经过了多少天。';
+}
+document.getElementById('anni-type-year').addEventListener('click', () => setAnniType('year'));
+document.getElementById('anni-type-since').addEventListener('click', () => setAnniType('since'));
 function openAnniModal(prefill) {
   const m = document.getElementById('anni-modal');
+  anniEditingId = null;
+  document.getElementById('anni-modal-title').textContent = '添加纪念日';
   document.getElementById('anni-name').value = '';
   document.getElementById('anni-date').value = prefill ? (new Date().getFullYear() + '-' + prefill) : todayStr();
   const ph = document.getElementById('anni-photo'); if (ph) ph.value = '';
+  setAnniType('year');
+  m.classList.add('show');
+  setTimeout(() => document.getElementById('anni-name').focus(), 50);
+}
+function editAnni(id) {
+  const a = DB.anniversaries.find(x => x.id === id); if (!a) return;
+  const m = document.getElementById('anni-modal');
+  anniEditingId = id;
+  document.getElementById('anni-modal-title').textContent = '修改纪念日';
+  document.getElementById('anni-name').value = a.name || '';
+  // 对于 since 类型用 fullDate（完整日期），对于 year 类型用完整日期取后5位
+  if (a.type === 'since' && a.fullDate) {
+    document.getElementById('anni-date').value = a.fullDate;
+  } else {
+    // year 类型：date 是 MM-DD，补全年份
+    const y = a.fullDate ? a.fullDate.slice(0, 4) : new Date().getFullYear();
+    document.getElementById('anni-date').value = y + '-' + a.date;
+  }
+  const ph = document.getElementById('anni-photo'); if (ph) ph.value = '';
+  setAnniType(a.type || 'year');
   m.classList.add('show');
   setTimeout(() => document.getElementById('anni-name').focus(), 50);
 }
@@ -2589,13 +2805,27 @@ function addAnni() {
   if (!name) { alert('写个名称吧'); return; }
   if (!val) { alert('选个日期'); return; }
   const mmdd = val.slice(5);
+  const type = anniTypeSel;
   const saveIt = (photo) => {
-    DB.anniversaries.push({ id: uid(), name, date: mmdd, showHome: true, photo: photo || '' });
+    if (anniEditingId) {
+      const a = DB.anniversaries.find(x => x.id === anniEditingId);
+      if (a) {
+        a.name = name; a.date = mmdd; a.type = type; a.fullDate = val;
+        if (photo !== undefined) a.photo = photo;
+      }
+      anniEditingId = null;
+    } else {
+      const existing = { id: uid(), name, date: mmdd, type, fullDate: val, showHome: true, photo: photo || '' };
+      DB.anniversaries.push(existing);
+    }
     save(); renderCalendar(); renderHomeAnniversaries(); updateBadges();
     document.getElementById('anni-modal').classList.remove('show');
   };
   const phInput = document.getElementById('anni-photo');
-  if (phInput && phInput.files && phInput.files[0]) {
+  // 编辑时未选新照片则保留原照片
+  if (anniEditingId && (!phInput || !phInput.files || !phInput.files[0])) {
+    saveIt(undefined);
+  } else if (phInput && phInput.files && phInput.files[0]) {
     fileToDataUrl(phInput.files[0], 480).then(saveIt).catch(() => saveIt(''));
   } else { saveIt(''); }
 }
@@ -2607,11 +2837,13 @@ function renderHomeAnniversaries() {
   sel.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
   box.innerHTML = `<div class="home-anni-head" id="home-anni-head">🎉 纪念日<span class="more">查看日历 ›</span></div><div class="home-anni-grid">` +
     sel.map(a => {
-      const cd = anniCountdown(a.date);
+      const cd = anniCountdown(a);
+      const isSince = (a.type || 'year') === 'since';
+      const dateStr = isSince ? (a.fullDate || a.date || '') : '每年 ' + (a.date || '').replace('-', '月') + '日';
       const bg = a.photo ? `<div class="anni-photo" style="background-image:url('${escapeAttr(a.photo)}')"></div>` : `<div class="anni-bg"></div>`;
       return `<div class="anni-card">${bg}<div class="anni-overlay">
         <div class="anni-name">${escapeHtml(a.name)}</div>
-        <div class="anni-date">每年 ${a.date.replace('-', '月')}日</div>
+        <div class="anni-date">${dateStr}</div>
         <div class="anni-cd ${cd.cls}">${cd.text}</div>
       </div></div>`;
     }).join('') + `</div>`;
@@ -2621,6 +2853,37 @@ function renderHomeAnniversaries() {
 /* ============ 工具 ============ */
 function escapeHtml(s) { return (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function escapeAttr(s) { return escapeHtml(s).replace(/"/g, '&quot;'); }
+
+/* ============ 列表折叠：通用计数 + 折叠 ============ */
+function updateFoldCount(wrapId, countId, n) {
+  const wrap = document.getElementById(wrapId);
+  if (!wrap) return;
+  const ce = document.getElementById(countId);
+  if (ce) ce.textContent = n;
+  wrap.classList.toggle('empty-list', n === 0);
+}
+function initFold(headId, wrapId) {
+  const head = document.getElementById(headId);
+  const wrap = document.getElementById(wrapId);
+  if (!head || !wrap) return;
+  head.addEventListener('click', () => {
+    if (wrap.classList.contains('empty-list')) return;
+    wrap.classList.toggle('folded');
+  });
+}
+function initAllFolds() {
+  const pairs = [
+    ['pc-fold-head', 'pc-fold-wrap'], ['shop-fold-head', 'shop-fold-wrap'],
+    ['anni-fold-head', 'anni-fold-wrap'], ['fast-fold-head', 'fast-fold-wrap'],
+    ['hb-fold-head', 'hb-fold-wrap'], ['diary-fold-head', 'diary-fold-wrap'],
+    ['meal-fold-head', 'meal-fold-wrap'], ['drink-fold-head', 'drink-fold-wrap'],
+    ['ex-fold-head', 'ex-fold-wrap'], ['w-fold-head', 'w-fold-wrap'],
+    ['home-agenda-fold-head', 'home-agenda-fold-wrap'], ['agenda-fold-head', 'agenda-fold-wrap'],
+    ['study-fold-head', 'study-fold-wrap'], ['sv-extra-fold-head', 'sv-extra-fold-wrap'],
+    ['sv-list-fold-head', 'sv-list-fold-wrap']
+  ];
+  pairs.forEach(p => initFold(p[0], p[1]));
+}
 function fileToDataUrl(file, maxW) {
   return new Promise((resolve, reject) => {
     const r = new FileReader();
@@ -2701,6 +2964,7 @@ function renderHome() {
 function renderHomeAgenda() {
   const list = document.getElementById('home-agenda-list'); if (!list) return;
   const items = (DB.agenda || []).slice().sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  updateFoldCount('home-agenda-fold-wrap', 'home-agenda-count', items.length);
   if (!items.length) { list.innerHTML = '<div class="empty">还没有待办，点「＋ 添加」记一件</div>'; return; }
   list.innerHTML = items.map(it => `
     <div class="item ${it.done ? 'done' : ''}">
@@ -2940,6 +3204,7 @@ renderSavings();
 renderHobbyTabs();
 migrateHobbyCosts();
 renderHobbies();
+trimFasts7();
 renderFasts();
 renderWeight();
 const fstart = document.getElementById('fast-start'); if (fstart) fstart.value = nowLocalStr();
@@ -2961,6 +3226,7 @@ function makeCollapsible(card, headSel) {
 document.querySelectorAll('.card').forEach(c => makeCollapsible(c));
 document.querySelectorAll('.home-block').forEach(c => makeCollapsible(c, '.home-block-head'));
 document.querySelectorAll('.home-anni').forEach(c => makeCollapsible(c, '.home-anni-head'));
+initAllFolds();
 applyNavDogs();
 applySecIcons();
 renderWeather();
